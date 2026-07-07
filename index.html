@@ -242,6 +242,7 @@
     <nav class="tabs" id="tabs">
       <button data-tab="overview" class="active">Overview</button>
       <button data-tab="officers">Officer explorer</button>
+      <button data-tab="arrests">Arrests</button>
       <button data-tab="discipline">Discipline</button>
       <button data-tab="decorated">The decorated</button>
       <button data-tab="map">Precinct map</button>
@@ -308,6 +309,23 @@
         <th class="num" data-k="rec">Awards</th><th class="num" data-k="chg">Charges</th>
       </tr></thead><tbody id="off-body"></tbody>
     </table><div class="sentinel" id="off-sentinel"></div></div>
+  </section>
+
+  <!-- ARRESTS -->
+  <section class="view" id="arrests-view">
+    <div class="view-intro"><h2>How arrests break down</h2><p>The department publishes a single lifetime arrest total per officer — no breakdown by charge, offense or year. But those totals are far from evenly spread. Here is how they vary across the force, by how many officers make them, by rank and by time served.</p></div>
+    <div class="stats" id="arr-stats"></div>
+    <div class="callout navy" id="arr-conc" style="margin-top:16px;"></div>
+    <div class="panel" style="margin-top:22px;"><h3>Officers by lifetime arrest count</h3><p class="psub">How many officers fall in each arrest range. The shape leans left — most officers make modest numbers, a few make thousands.</p><div id="arr-hist"></div></div>
+    <div class="grid2">
+      <div class="panel"><h3>Arrests by rank</h3><p class="psub">Detective grades dominate career totals. Switch to "per year of service" to strip out the fact that senior officers have simply had more years.</p>
+        <div class="metric-toggle" id="arr-rank-toggle" style="margin-bottom:14px;"><button data-m="avg" class="active">Average career total</button><button data-m="per_year">Per year of service</button></div>
+        <div id="arr-rank"></div></div>
+      <div class="panel"><h3>Arrests by time served</h3><p class="psub">Career totals climb with tenure — mostly accumulation. The per-year rate shows officers are most active early, then ease off as they rise into supervisory roles.</p>
+        <div class="metric-toggle" id="arr-tenure-toggle" style="margin-bottom:14px;"><button data-m="avg" class="active">Average career total</button><button data-m="per_year">Per year of service</button></div>
+        <div id="arr-tenure"></div></div>
+    </div>
+    <p class="result-count" style="margin-top:16px;">An arrest credited here reflects an officer's assignment: patrol and detective commands make the most, while administrative, training and headquarters postings make few or none. Totals are cumulative over a career, so the per-year figures divide by years since appointment to compare activity on a level footing. There is no charge-level or offense-type detail in this data.</p>
   </section>
 
   <!-- DISCIPLINE -->
@@ -452,6 +470,7 @@ function showTab(tab){
   document.querySelectorAll("section.view").forEach(v=>v.classList.toggle("active", v.id===tab+"-view"));
   window.scrollTo({top:0,behavior:"instant"});
   if(tab==="officers") loadOfficers();
+  if(tab==="arrests") loadArrests();
   if(tab==="discipline") loadDiscipline();
   if(tab==="decorated") loadDecorated();
   if(tab==="map") loadMap();
@@ -526,6 +545,35 @@ async function initOverview(){
   lineChart($("#ov-appt"), STATS.appointments_by_year, {color:"#1c2b46"});
   lineChart($("#ov-charges"), STATS.charges_by_year, {color:"#b23b3b"});
   lineChart($("#ov-honors"), STATS.honors_by_year, {color:"#9a7b1f"});
+}
+
+/* ---------- Arrests breakdown ---------- */
+let arrLoaded=false;
+function loadArrests(){
+  if(arrLoaded) return;
+  if(!STATS){ setTimeout(loadArrests,150); return; }
+  arrLoaded=true;
+  const A=STATS.arrests;
+  $("#arr-stats").innerHTML=[
+    [fmt(A.total),"Lifetime arrests, all officers"],
+    [fmt(A.median),`Median per officer &middot; average is ${fmt(A.mean)}`],
+    [`${fmt(A.zero)} &middot; ${A.zero_pct}%`,"Officers with zero arrests"],
+    [fmt(A.max),"Most by a single officer"],
+  ].map(([n,l])=>`<div class="stat"><div class="num">${n}</div><div class="lab">${l}</div></div>`).join("");
+  const c=A.concentration, tenth=Math.round(.1*STATS.officers);
+  $("#arr-conc").innerHTML=`<b>Arrests are concentrated in a minority of officers.</b> The busiest <b>10%</b> — about ${fmt(tenth)} officers — account for <b>${c.top10}%</b> of all lifetime arrests, and the busiest quarter for <b>${c.top25}%</b>. The least-active half account for just <b>${c.bottom50}%</b>. That skew is why the average (${fmt(A.mean)}) sits well above the median (${fmt(A.median)}).`;
+  barChart($("#arr-hist"), A.hist, {label:it=>it.band+" arrests", value:it=>it.n});
+  renderArrRank("avg"); renderArrTenure("avg");
+  $("#arr-rank-toggle").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;
+    document.querySelectorAll("#arr-rank-toggle button").forEach(x=>x.classList.toggle("active",x===b));renderArrRank(b.dataset.m);});
+  $("#arr-tenure-toggle").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;
+    document.querySelectorAll("#arr-tenure-toggle button").forEach(x=>x.classList.toggle("active",x===b));renderArrTenure(b.dataset.m);});
+}
+function renderArrRank(m){
+  barChart($("#arr-rank"), STATS.arrests.by_rank, {label:it=>titlecase(it.rank), value:it=>it[m], cls:m==="per_year"?"green":""});
+}
+function renderArrTenure(m){
+  barChart($("#arr-tenure"), STATS.arrests.by_tenure, {label:it=>it.band+" yrs", value:it=>it[m], cls:m==="per_year"?"green":""});
 }
 
 /* ---------- Windowed list ---------- */

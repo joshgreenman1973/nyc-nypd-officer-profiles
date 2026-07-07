@@ -168,12 +168,58 @@ print("7/7  Overall stats…")
 tot_arrests = sum(r[5] for r in rows)
 tot_recognitions = sum(r[6] for r in rows)
 disciplined_officers = sum(1 for r in rows if r[7] > 0)
+def ten_band(yrs):
+    return "25+" if yrs >= 25 else "20–24" if yrs >= 20 else "15–19" if yrs >= 15 else "10–14" if yrs >= 10 else "5–9" if yrs >= 5 else "0–4"
+TEN_ORDER = ["0–4", "5–9", "10–14", "15–19", "20–24", "25+"]
+
 tenure = Counter()
 for r in rows:
     if r[4]:
-        yrs = 2026 - r[4]
-        bucket = "25+" if yrs >= 25 else "20–24" if yrs >= 20 else "15–19" if yrs >= 15 else "10–14" if yrs >= 10 else "5–9" if yrs >= 5 else "0–4"
-        tenure[bucket] += 1
+        tenure[ten_band(2026 - r[4])] += 1
+
+# ---- arrest breakdown (arrests_total is lifetime cumulative; no charge/type detail exists) ----
+def median(lst):
+    s = sorted(lst); m = len(s)
+    return 0 if not m else (s[m//2] if m % 2 else (s[m//2-1] + s[m//2]) / 2)
+
+arrs = [r[5] for r in rows]
+n = len(arrs); tot_a = sum(arrs)
+asc = sorted(arrs); desc = asc[::-1]
+def top_share(frac):
+    k = max(1, int(frac * n))
+    return round(100 * sum(desc[:k]) / tot_a, 1)
+bands = [(0,0,"0"),(1,24,"1–24"),(25,49,"25–49"),(50,99,"50–99"),
+         (100,199,"100–199"),(200,499,"200–499"),(500,999,"500–999"),(1000,10**9,"1,000+")]
+hist = [{"band": lab, "n": sum(1 for a in arrs if lo <= a <= hi)} for lo, hi, lab in bands]
+
+rank_arr = defaultdict(list); rank_yrs = defaultdict(int)
+ten_arr = defaultdict(int); ten_yrs = defaultdict(int); ten_n = defaultdict(int)
+for r in rows:
+    rank_arr[r[2]].append(r[5])
+    sv = max(1, 2026 - r[4]) if r[4] else 0
+    if sv: rank_yrs[r[2]] += sv
+    if r[4]:
+        b = ten_band(2026 - r[4])
+        ten_arr[b] += r[5]; ten_yrs[b] += max(1, 2026 - r[4]); ten_n[b] += 1
+by_rank = []
+for rk, lst in rank_arr.items():
+    if len(lst) >= 100:
+        yrs = rank_yrs[rk] or len(lst)
+        by_rank.append({"rank": rk, "n": len(lst), "avg": round(sum(lst)/len(lst), 1),
+                        "median": median(lst), "per_year": round(sum(lst)/yrs, 1)})
+by_rank.sort(key=lambda x: -x["avg"])
+by_tenure = [{"band": b, "n": ten_n[b], "avg": round(ten_arr[b]/ten_n[b], 1),
+              "per_year": round(ten_arr[b]/ten_yrs[b], 1)} for b in TEN_ORDER if ten_n[b]]
+
+arrests_break = {
+    "total": tot_a, "mean": round(tot_a/n, 1), "median": median(arrs),
+    "p90": asc[int(.9*n)], "max": desc[0],
+    "zero": sum(1 for a in arrs if a == 0),
+    "zero_pct": round(100*sum(1 for a in arrs if a == 0)/n, 1),
+    "hist": hist, "by_rank": by_rank, "by_tenure": by_tenure,
+    "concentration": {"top1": top_share(.01), "top10": top_share(.10),
+                      "top25": top_share(.25), "bottom50": round(100*sum(asc[:n//2])/tot_a, 1)},
+}
 
 def year4(s):
     return to_int(s[:4]) if s and s[:4].isdigit() else 0
@@ -214,6 +260,7 @@ stats = {
     "appointments_by_year": appointments_by_year,
     "charges_by_year": charges_by_year,
     "honors_by_year": honors_by_year,
+    "arrests": arrests_break,
 }
 
 # --------------------------------------------------------------------------

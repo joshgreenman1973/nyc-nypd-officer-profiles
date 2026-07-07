@@ -66,7 +66,12 @@ To rebuild: `python3 build.py` (standard library only, no API token required).
   patrol precinct; the rest (housing, transit, headquarters, academy recruits and
   specialized units) are not on the map. The boundary file contains 78 precinct areas.
   Precinct averages are computed over precinct-assigned officers only.
-- **Two ways to count recognitions.** The awards chart and the "recognitions awarded"
+- **Awards given vs officers who hold them.** A single officer can receive the same award
+  many times, so the count of awards is much larger than the count of recipients. Excellent
+  Police Duty, for example, is awarded 91,330 times but to 16,468 distinct officers (about
+  5.5 each); Meritorious Police Duty 46,724 times to 10,687 officers. The awards table shows
+  both columns. The six top medals are almost exactly one per officer.
+- **Two ways to count recognitions.** The awards table and the "recognitions awarded"
   headline (141,235) count individual award records in `i9n8-a8ed`. The roster also carries
   a per-officer recognition counter (`department_recognitions`) that sums to 144,444 —
   slightly higher, a quirk of how the two are maintained. We use the itemized figure so the

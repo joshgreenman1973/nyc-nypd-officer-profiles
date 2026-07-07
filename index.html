@@ -161,7 +161,19 @@
   .medal{border:2px solid var(--gold);background:var(--gold-bg);padding:9px 13px;min-width:120px;}
   .medal .mn{font-weight:700;font-size:12.5px;color:var(--gold);text-transform:uppercase;letter-spacing:.02em;}
   .medal .mc{font-family:var(--serif);font-size:22px;font-weight:600;color:var(--ink);}
+  .medal .mmeta{font-size:11px;font-weight:700;color:var(--gold);margin:1px 0 3px;}
   .medal .md{font-size:11px;color:var(--muted);}
+  /* awards table (times awarded vs officers) */
+  .awardtbl{width:100%;border-collapse:collapse;font-size:13px;}
+  .awardtbl th{text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.03em;color:var(--muted);
+    font-weight:700;border-bottom:1.5px solid var(--line);padding:0 8px 7px;}
+  .awardtbl th.num,.awardtbl td.num{text-align:right;font-variant-numeric:tabular-nums;}
+  .awardtbl td{padding:6px 8px;border-bottom:1px solid var(--line-soft);}
+  .awardtbl tr:last-child td{border-bottom:none;}
+  .awardtbl td.aw{font-weight:600;color:var(--ink-soft);}
+  .awardtbl td.num{font-weight:700;color:var(--ink);}
+  .awardtbl td.times{background-clip:padding-box;}
+  .awardtbl td.off{color:var(--gold);}
 
   /* Methodology */
   .prose{max-width:74ch;font-size:14.5px;color:var(--ink-soft);}
@@ -252,7 +264,7 @@
       <div class="panel"><h3>How long they've served</h3><p class="psub">Years since appointment, all active officers</p><div id="ov-tenure"></div></div>
     </div>
     <div class="grid2">
-      <div class="panel"><h3>Department recognitions</h3><p class="psub">Every award type, from routine to rare (log scale of counts)</p><div id="ov-awards"></div></div>
+      <div class="panel"><h3>Department recognitions</h3><p class="psub">How many times each award is given, and how many officers hold at least one. The routine honors are awarded to the same officers over and over.</p><div id="ov-awards"></div></div>
       <div class="panel"><h3>The training machine</h3><p class="psub">Most-logged training types across 12.7 million records</p><div id="ov-training"></div></div>
     </div>
 
@@ -382,7 +394,8 @@
         <li><b>It's a live snapshot of active officers.</b> Retired or separated members drop off entirely — this is not a historical roster of everyone who ever served. Medal-holders who have left the force are not counted among "the decorated."</li>
         <li><b>Arrests and recognitions are pre-totalled.</b> The department publishes lifetime cumulative counts, so they can't be sliced by year from this data alone.</li>
         <li><b>The precinct map covers patrol precincts only.</b> Officer commands were mapped to a precinct by parsing commands like <code>075 PRECINCT</code>, with the Central Park precinct (the 22nd) matched by name. About 13,167 of 34,237 officers sit in a patrol precinct; the rest are in housing, transit, headquarters, the academy or specialized units and are not on the map. The boundary file contains 78 precinct areas.</li>
-        <li><b>Two ways to count recognitions.</b> The awards chart and the "recognitions awarded" figure (141,235) count individual award records in the recognition dataset. The department also keeps a per-officer recognition counter whose values sum slightly higher, to 144,444; the difference is a quirk of how the two are maintained.</li>
+        <li><b>Awards given vs officers who hold them.</b> The same officer can receive an award many times, so the count of awards is far larger than the number of recipients — Excellent Police Duty is given 91,330 times but to 16,468 officers (about 5.5 each). The awards table shows both figures side by side. The medals, by contrast, are almost one-per-officer.</li>
+        <li><b>Two ways to count recognitions.</b> The awards table and the "recognitions awarded" figure (141,235) count individual award records in the recognition dataset. The department also keeps a per-officer recognition counter whose values sum slightly higher, to 144,444; the difference is a quirk of how the two are maintained.</li>
         <li><b>Training records contain known data-entry errors,</b> per the department's own dataset description, so the training chart is best read as broad scale, not exact tallies.</li>
         <li><b>Officer names are published by the department.</b> This site republishes only what the NYPD already releases publicly, and adds no new personal information.</li>
       </ul>
@@ -484,6 +497,17 @@ function lineChart(el, series, {color="#1c2b46"}={}){
     ${yticks.map(yl).join("")}${xticks.map(xl).join("")}${bands}
   </svg>`;
 }
+function renderAwards(el, items){
+  const max=Math.max(...items.map(i=>i.n)), lg=v=>Math.log10(Math.max(v,1));
+  const w=v=>(lg(v)/lg(max)*100);
+  el.innerHTML=`<table class="awardtbl"><thead><tr><th>Award</th><th class="num">Times awarded</th><th class="num">Officers with&nbsp;≥1</th></tr></thead><tbody>`+
+    items.map(it=>{
+      const pct=w(it.n).toFixed(1);
+      return `<tr><td class="aw">${esc(titlecase(it.award))}</td>`+
+        `<td class="num times" style="background:linear-gradient(90deg,var(--gold-bg) ${pct}%, transparent ${pct}%)">${fmt(it.n)}</td>`+
+        `<td class="num off">${fmt(it.officers)}</td></tr>`;
+    }).join("")+`</tbody></table>`;
+}
 let STATS=null;
 async function initOverview(){
   STATS = await getJSON("data/stats.json");
@@ -493,11 +517,11 @@ async function initOverview(){
     [fmt(STATS.total_arrests),"Lifetime arrests, all officers"],
     [fmt(STATS.recognitions_awarded),"Department recognitions awarded"],
     [fmt(STATS.disciplined_officers),`Officers with a sustained charge (${STATS.disciplined_pct}%)`],
-    [fmt(STATS.high_honor_awards),"Top valor &amp; merit medals"],
+    [fmt(STATS.high_honor_awards),`Top valor &amp; merit medals, held by ${fmt(STATS.decorated_officers)} officers`],
   ].map(([n,l])=>`<div class="stat"><div class="num">${n}</div><div class="lab">${l}</div></div>`).join("");
   barChart($("#ov-ranks"), STATS.ranks.slice(0,12), {label:it=>titlecase(it.rank), value:it=>it.n});
   barChart($("#ov-tenure"), STATS.tenure, {label:it=>it.band+" yrs", value:it=>it.n, cls:"green"});
-  barChart($("#ov-awards"), STATS.awards, {label:it=>titlecase(it.award), value:it=>it.n, cls:"gold", scale:"log"});
+  renderAwards($("#ov-awards"), STATS.awards);
   barChart($("#ov-training"), STATS.training.slice(0,10), {label:it=>titlecase(it.training.replace(/^CLT-/,"")), value:it=>it.n});
   lineChart($("#ov-appt"), STATS.appointments_by_year, {color:"#1c2b46"});
   lineChart($("#ov-charges"), STATS.charges_by_year, {color:"#b23b3b"});
@@ -593,8 +617,10 @@ async function loadDecorated(){
   try{
     const d = await getJSON("data/decorated.json");
     DEC = d.officers;
-    $("#dec-medals").innerHTML = d.counts.map(c=>
-      `<div class="medal"><div class="mc">${fmt(c.n)}</div><div class="mn">${titlecase(c.award)}</div><div class="md">${esc(MEDAL_DESC[c.award]||"")}</div></div>`).join("");
+    $("#dec-medals").innerHTML = d.counts.map(c=>{
+      const meta = c.officers==null ? "" : (c.n===c.officers ? `held by ${fmt(c.officers)} officers` : `${fmt(c.n)} awards to ${fmt(c.officers)} officers`);
+      return `<div class="medal"><div class="mc">${fmt(c.n)}</div><div class="mn">${titlecase(c.award)}</div><div class="mmeta">${meta}</div><div class="md">${esc(MEDAL_DESC[c.award]||"")}</div></div>`;
+    }).join("");
     $("#dec-medal").insertAdjacentHTML("beforeend", d.counts.map(c=>`<option value="${esc(c.award)}">${titlecase(c.award)}</option>`).join(""));
     decList = windowedList($("#dec-body"), $("#dec-sentinel"), o=>
       `<tr onclick="openOfficer('${o.profile_id}')"><td class="nm">${esc(titlecase(o.name))}</td>`+

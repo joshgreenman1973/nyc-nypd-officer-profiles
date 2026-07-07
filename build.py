@@ -73,9 +73,16 @@ print(f"     {len(charges):,} charges")
 sustained = Counter(c["profile_id"] for c in charges if c.get("profile_id"))
 
 # --------------------------------------------------------------------------
-print("3/7  Award aggregate + high honors…")
-award_agg = soda("i9n8-a8ed", {"$select": "award,count(*) as n", "$group": "award", "$order": "n desc", "$limit": 200})
-award_summary = [{"award": a["award"], "n": to_int(a["n"])} for a in award_agg if a.get("award")]
+print("3/7  Recognition records (awards + distinct recipients)…")
+recog_all = soda("i9n8-a8ed", {"$select": "profile_id,award", "$limit": 300000})
+print(f"     {len(recog_all):,} award records")
+award_ct = Counter(r["award"] for r in recog_all if r.get("award"))
+award_rc = defaultdict(set)  # award -> set of officers who hold it
+for r in recog_all:
+    if r.get("award"):
+        award_rc[r["award"]].add(r.get("profile_id"))
+# award_summary: how many times each award was given AND how many distinct officers hold at least one
+award_summary = [{"award": a, "n": award_ct[a], "officers": len(award_rc[a])} for a, _ in award_ct.most_common()]
 
 honor_rows = soda("i9n8-a8ed", {
     "$select": "profile_id,award,date",
@@ -201,7 +208,7 @@ stats = {
     "ranks": [{"rank": r, "n": n} for r, n in rank_counter.most_common()],
     "tenure": [{"band": b, "n": tenure[b]} for b in ["0–4", "5–9", "10–14", "15–19", "20–24", "25+"]],
     "awards": award_summary,
-    "honor_counts": [{"award": a, "n": honor_counts[a]} for a in HIGH_HONORS if honor_counts[a]],
+    "honor_counts": [{"award": a, "n": honor_counts[a], "officers": len(award_rc[a])} for a in HIGH_HONORS if honor_counts[a]],
     "training": training_summary,
     "precincts_mapped": sum(1 for r in rows if r[8]),
     "appointments_by_year": appointments_by_year,

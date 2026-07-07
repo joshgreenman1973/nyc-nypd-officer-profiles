@@ -74,6 +74,14 @@
   .callout{border:2px solid var(--red);background:var(--red-bg);padding:14px 16px;margin-top:22px;font-size:14px;color:var(--ink-soft);}
   .callout.navy{border-color:var(--navy);background:var(--navy-tint);}
   .callout b{color:var(--ink);}
+  .linechart svg{display:block;width:100%;height:auto;}
+  .lc-axis{font-size:10px;fill:var(--muted);font-family:var(--sans);}
+  .lc-grid{stroke:var(--line-soft);stroke-width:1;}
+  .linechart rect:hover{fill:rgba(28,43,70,.06);}
+  .snapbar{display:inline-flex;align-items:center;gap:8px;background:var(--navy);color:#fff;font-size:12px;font-weight:600;
+    padding:5px 12px;border-radius:40px;letter-spacing:.01em;}
+  .snapbar .dot{width:7px;height:7px;border-radius:50%;background:#7fd18c;box-shadow:0 0 0 0 rgba(127,209,140,.6);animation:snp 2.4s infinite;}
+  @keyframes snp{0%{box-shadow:0 0 0 0 rgba(127,209,140,.55)}70%{box-shadow:0 0 0 6px rgba(127,209,140,0)}100%{box-shadow:0 0 0 0 rgba(127,209,140,0)}}
 
   /* Controls */
   .controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:0 0 14px;}
@@ -184,9 +192,8 @@
     <h1>The NYPD, officer by officer</h1>
     <p class="standfirst">In September 2025 the New York Police Department began publishing a profile of every active uniformed officer — rank, command, lifetime arrests, medals and sustained discipline — and refreshing it every week. This is that data, made searchable.</p>
     <div class="meta-line">
+      <span class="snapbar"><span class="dot"></span>Point-in-time snapshot &middot; exported <b id="asof" style="color:#fff">—</b> &middot; refreshed weekly</span>
       <span>Built from the department's own <b>Officer Profile</b> datasets on NYC Open Data</span>
-      <span>&middot;</span>
-      <span>Snapshot: <b id="asof">—</b></span>
       <span>&middot;</span>
       <a href="#" onclick="showTab('method');return false;">Methodology &amp; caveats</a>
     </div>
@@ -205,6 +212,9 @@
 
   <!-- OVERVIEW -->
   <section class="view active" id="overview-view">
+    <div class="callout navy" style="margin-top:0;margin-bottom:16px;">
+      <b>What time is this data for?</b> It's a <b>point-in-time snapshot the NYPD exported on <span id="snap-date">—</span></b>, and the department refreshes it every week. Every arrest and recognition figure is a <b>cumulative career total as of that date</b> — not a count for any single year. The force changes constantly as officers are hired and retire, so this is today's roster, not a historical record. The one place you can see genuine change over time is <a href="#" onclick="document.getElementById('trends').scrollIntoView({behavior:'smooth'});return false;">What changes over time</a>, below.
+    </div>
     <div class="stats" id="ov-stats"></div>
     <p class="result-count" style="margin-top:8px;">Lifetime arrest and recognition totals are cumulative per officer, as reported by the department. "Sustained charge" means a disciplinary charge that ended in a guilty finding — see the caveat below.</p>
     <div class="grid2">
@@ -214,6 +224,18 @@
     <div class="grid2">
       <div class="panel"><h3>Department recognitions</h3><p class="psub">Every award type, from routine to rare (log scale of counts)</p><div id="ov-awards"></div></div>
       <div class="panel"><h3>The training machine</h3><p class="psub">Most-logged training types across 12.7 million records</p><div id="ov-training"></div></div>
+    </div>
+
+    <div id="trends" style="margin-top:34px;padding-top:8px;border-top:2px solid var(--ink);">
+      <div class="view-intro" style="margin:16px 0 4px;">
+        <h2 style="font-size:24px;">What changes over time</h2>
+        <p>Most of this data is a still photograph — arrest and award counts are lifetime totals with no yearly breakdown. But three date fields let us trace real change. <b>Read the last year or two with care:</b> they're incomplete, for the reasons noted under each chart. Hover any chart for the yearly figure.</p>
+      </div>
+      <div class="grid2">
+        <div class="panel"><h3>Today's force, by hiring year</h3><p class="psub">Active officers by the year they were appointed. Earlier years are thinned by retirement, so this is the <em>surviving</em> cohort, not the size of each original class. The 2026 bar is a partial year.</p><div id="ov-appt" class="linechart"></div></div>
+        <div class="panel"><h3>Sustained charges, by year decided</h3><p class="psub">Guilty disciplinary findings by the year they were decided. The most recent years lag sharply because cases are still moving through the process — not because misconduct stopped.</p><div id="ov-charges" class="linechart"></div></div>
+      </div>
+      <div class="panel" style="margin-top:20px;"><h3>Top medals awarded, by year</h3><p class="psub">The six highest valor and merit honors, held by officers on today's force, by the year the medal was awarded. Only medals belonging to still-active officers appear, so earlier years understate the totals.</p><div id="ov-honors" class="linechart"></div></div>
     </div>
     <div class="callout">
       <b>The single most important caveat.</b> The disciplinary data published here contains <b>only charges that ended in a guilty finding</b> — every one of the 3,925 charges has a disposition of guilty, pleaded guilty or no contest. Allegations that were dismissed, unsubstantiated or are still pending do <b>not</b> appear, and civilian complaints to the Civilian Complaint Review Board live in a separate system entirely. An officer with no record here has no <em>sustained departmental charge</em> — which is not the same as a clean complaint history.
@@ -334,8 +356,17 @@
         <li><b>Officer names are published by the department.</b> This site republishes only what the NYPD already releases publicly, and adds no new personal information.</li>
       </ul>
 
+      <h3>What time the data is for, and the trends</h3>
+      <ul>
+        <li><b>This is a weekly point-in-time snapshot,</b> exported by the department on the date shown at the top of the page. Arrest and recognition figures are lifetime cumulative totals as of that date, with no annual breakdown — they are not counts for any single year.</li>
+        <li>The three "What changes over time" charts are the only genuine time series here, each built from a real date field: officer <code>appointment_date</code>, disciplinary charge <code>date</code> and award <code>date</code>.</li>
+        <li><b>Hiring by year is survivorship-biased.</b> Because only active officers are in the data, earlier years show the surviving cohort, not the original class size — an officer hired in 1995 who has since retired isn't counted. The most recent year is partial.</li>
+        <li><b>Sustained charges by year lag at the recent end</b> because cases take time to be adjudicated and published; a low recent count reflects the process, not a drop in conduct issues.</li>
+        <li><b>Medals by year understate earlier years,</b> since only honors held by still-active officers appear.</li>
+      </ul>
+
       <h3>How to read it</h3>
-      <p>All counts start at zero. The awards chart uses a log scale because a handful of award types (Excellent and Meritorious Police Duty) dwarf the rest; every other chart is linear. The precinct choropleth uses quantile color breaks so each shade holds a similar number of precincts.</p>
+      <p>All counts start at zero. The awards bar chart uses a log scale because a handful of award types (Excellent and Meritorious Police Duty) dwarf the rest; every other chart is linear. The precinct choropleth uses a linear color ramp between the lowest and highest precinct values for the chosen metric.</p>
 
       <button class="ai-btn" onclick="document.getElementById('aipop').classList.toggle('open')">⚠ AI caution — read before relying on this</button>
       <div class="ai-pop" id="aipop">
@@ -396,10 +427,36 @@ function barChart(el, items, {label, value, cls="", scale="linear", fmtv=fmt}){
       `<span class="bar-val">${fmtv(v)}</span></div>`;
   }).join("");
 }
+function lineChart(el, series, {color="#1c2b46"}={}){
+  series=(series||[]).filter(d=>d&&d.n!=null);
+  if(!series.length){el.innerHTML='<p class="psub" style="margin:0">No datable records.</p>';return;}
+  const W=520,H=195,pl=44,pr=14,pt=14,pb=30;
+  const years=series.map(d=>d.year), vals=series.map(d=>d.n);
+  const minY=Math.min(...years),maxY=Math.max(...years),maxV=Math.max(...vals)||1;
+  const X=y=>pl+(maxY===minY?0:(y-minY)/(maxY-minY))*(W-pl-pr);
+  const Y=v=>H-pb-(v/maxV)*(H-pt-pb);
+  const pts=series.map(d=>[X(d.year),Y(d.n)]);
+  const line="M"+pts.map(p=>p[0].toFixed(1)+","+p[1].toFixed(1)).join("L");
+  const area=line+`L${X(maxY).toFixed(1)},${H-pb}L${X(minY).toFixed(1)},${H-pb}Z`;
+  const yticks=[0,Math.round(maxV/2),maxV], xticks=[minY,Math.round((minY+maxY)/2),maxY];
+  const bandW=(W-pl-pr)/series.length;
+  const grid=v=>`<line class="lc-grid" x1="${pl}" y1="${Y(v).toFixed(1)}" x2="${W-pr}" y2="${Y(v).toFixed(1)}"/>`;
+  const yl=v=>`<text class="lc-axis" x="${pl-7}" y="${(Y(v)+3).toFixed(1)}" text-anchor="end">${fmt(v)}</text>`;
+  const xl=y=>`<text class="lc-axis" x="${X(y).toFixed(1)}" y="${H-pb+16}" text-anchor="middle">${y}</text>`;
+  const last=pts[pts.length-1];
+  const bands=series.map(d=>`<rect x="${(X(d.year)-bandW/2).toFixed(1)}" y="${pt}" width="${bandW.toFixed(1)}" height="${H-pt-pb}" fill="transparent"><title>${d.year}: ${fmt(d.n)}</title></rect>`).join("");
+  el.innerHTML=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="line chart">
+    ${yticks.map(grid).join("")}
+    <path d="${area}" fill="${color}1f"/>
+    <path d="${line}" fill="none" stroke="${color}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+    <circle cx="${last[0].toFixed(1)}" cy="${last[1].toFixed(1)}" r="3.5" fill="${color}"/>
+    ${yticks.map(yl).join("")}${xticks.map(xl).join("")}${bands}
+  </svg>`;
+}
 let STATS=null;
 async function initOverview(){
   STATS = await getJSON("data/stats.json");
-  $("#asof").textContent = STATS.export_date; $("#asof2").textContent = STATS.export_date;
+  $("#asof").textContent = STATS.export_date; $("#asof2").textContent = STATS.export_date; $("#snap-date").textContent = STATS.export_date;
   $("#ov-stats").innerHTML = [
     [fmt(STATS.officers),"Active uniformed officers"],
     [fmt(STATS.total_arrests),"Lifetime arrests, all officers"],
@@ -411,6 +468,9 @@ async function initOverview(){
   barChart($("#ov-tenure"), STATS.tenure, {label:it=>it.band+" yrs", value:it=>it.n, cls:"green"});
   barChart($("#ov-awards"), STATS.awards, {label:it=>titlecase(it.award), value:it=>it.n, cls:"gold", scale:"log"});
   barChart($("#ov-training"), STATS.training.slice(0,10), {label:it=>titlecase(it.training.replace(/^CLT-/,"")), value:it=>it.n});
+  lineChart($("#ov-appt"), STATS.appointments_by_year, {color:"#1c2b46"});
+  lineChart($("#ov-charges"), STATS.charges_by_year, {color:"#b23b3b"});
+  lineChart($("#ov-honors"), STATS.honors_by_year, {color:"#9a7b1f"});
 }
 
 /* ---------- Windowed list ---------- */

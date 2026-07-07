@@ -166,6 +166,23 @@ for r in rows:
         bucket = "25+" if yrs >= 25 else "20–24" if yrs >= 20 else "15–19" if yrs >= 15 else "10–14" if yrs >= 10 else "5–9" if yrs >= 5 else "0–4"
         tenure[bucket] += 1
 
+def year4(s):
+    return to_int(s[:4]) if s and s[:4].isdigit() else 0
+
+def continuous_series(counter, floor):
+    present = [y for y in counter if y]
+    if not present:
+        return []
+    lo = max(min(present), floor)
+    return [{"year": y, "n": counter.get(y, 0)} for y in range(lo, 2027)]
+
+appt_years = Counter(r[4] for r in rows if 1900 < (r[4] or 0) <= 2026)
+charge_years = Counter(year4(c.get("date")) for c in charges)
+honor_years = Counter(year4(h.get("date")) for h in honor_rows)
+appointments_by_year = continuous_series(appt_years, 1980)
+charges_by_year = continuous_series(charge_years, 1995)
+honors_by_year = continuous_series(honor_years, 1985)
+
 stats = {
     "export_date": export_date,
     "officers": len(rows),
@@ -184,6 +201,9 @@ stats = {
     "honor_counts": [{"award": a, "n": honor_counts[a]} for a in HIGH_HONORS if honor_counts[a]],
     "training": training_summary,
     "precincts_mapped": sum(1 for r in rows if r[8]),
+    "appointments_by_year": appointments_by_year,
+    "charges_by_year": charges_by_year,
+    "honors_by_year": honors_by_year,
 }
 
 # --------------------------------------------------------------------------

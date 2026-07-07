@@ -51,7 +51,9 @@ def year_of(iso):
 PRECINCT_RE = re.compile(r"^(\d{1,3})\s*(?:PCT|PRECINCT)")
 def precinct_of(command):
     if not command: return None
-    m = PRECINCT_RE.match(command.strip())
+    c = command.strip().upper()
+    if c.startswith("CENTRAL PARK"): return 22   # 22nd Precinct = Central Park (no number in the command string)
+    m = PRECINCT_RE.match(c)
     return to_int(m.group(1)) if m else None
 
 # --------------------------------------------------------------------------
@@ -189,6 +191,7 @@ stats = {
     "total_arrests": tot_arrests,
     "avg_arrests": round(tot_arrests / len(rows), 1),
     "total_recognitions": tot_recognitions,
+    "recognitions_awarded": sum(a["n"] for a in award_summary),  # itemized award records (matches the awards chart)
     "avg_recognitions": round(tot_recognitions / len(rows), 1),
     "total_charges": len(charges),
     "disciplined_officers": disciplined_officers,

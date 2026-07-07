@@ -182,6 +182,36 @@
   footer a{color:var(--ink-soft);}
   .spin{display:inline-block;width:13px;height:13px;border:2px solid var(--line);border-top-color:var(--navy);border-radius:50%;animation:sp .7s linear infinite;vertical-align:-2px;margin-right:6px;}
   @keyframes sp{to{transform:rotate(360deg)}}
+
+  /* ---------- design polish ---------- */
+  body{background-image:radial-gradient(circle at 1px 1px, rgba(28,43,70,.035) 1px, transparent 0);background-size:26px 26px;}
+  .kicker{display:inline-flex;align-items:center;gap:9px;}
+  .kicker::before{content:"";width:22px;height:3px;background:var(--navy);}
+  h1{letter-spacing:-.018em;}
+  nav.tabs{transition:box-shadow .2s;}
+  nav.tabs.scrolled{box-shadow:0 10px 20px -14px rgba(0,0,0,.5);}
+  nav.tabs button.active{background:linear-gradient(var(--navy-tint),rgba(238,241,246,0));}
+  .stats{box-shadow:6px 6px 0 rgba(28,43,70,.07);}
+  .stat{transition:background .15s;}
+  .stat .num{letter-spacing:-.014em;}
+  .stat .num::after{content:"";display:block;width:26px;height:2px;background:var(--navy);opacity:.3;margin-top:10px;}
+  .stat .lab{margin-top:9px;}
+  .panel{box-shadow:6px 6px 0 rgba(28,43,70,.06);}
+  .panel h3{display:flex;align-items:center;gap:10px;}
+  .panel h3::before{content:"";width:13px;height:3px;background:var(--navy);flex:none;}
+  .view-intro h2, #trends h2{display:flex;align-items:center;gap:12px;}
+  .view-intro h2::before, #trends h2::before{content:"";width:18px;height:3px;background:var(--navy);flex:none;}
+  .tbl-wrap{box-shadow:6px 6px 0 rgba(28,43,70,.05);}
+  thead th{box-shadow:inset 0 -3px 0 rgba(255,255,255,.14);}
+  thead th:hover{background:var(--navy-soft);}
+  .callout{box-shadow:5px 5px 0 rgba(178,59,59,.09);}
+  .callout.navy{box-shadow:5px 5px 0 rgba(28,43,70,.09);}
+  .medal{box-shadow:3px 3px 0 rgba(154,123,31,.13);transition:transform .12s;}
+  .medal:hover{transform:translateY(-2px);}
+  .map-box{box-shadow:6px 6px 0 rgba(28,43,70,.06);}
+  .nm{transition:color .1s;}
+  tbody tr:hover .nm{color:var(--navy-soft);}
+  @media(max-width:820px){.stats{box-shadow:4px 4px 0 rgba(28,43,70,.07);}}
 </style>
 </head>
 <body>
@@ -303,7 +333,7 @@
 
   <!-- MAP -->
   <section class="view" id="map-view">
-    <div class="view-intro"><h2>The force, by precinct</h2><p>Where patrol officers are assigned, and how their aggregate numbers vary across the city's 77 precincts. Click a precinct to see its officers.</p></div>
+    <div class="view-intro"><h2>The force, by precinct</h2><p>Where patrol officers are assigned, and how their aggregate numbers vary from precinct to precinct. Click any precinct to see its officers.</p></div>
     <div class="metric-toggle" id="map-metric">
       <button data-m="officers" class="active">Officers assigned</button>
       <button data-m="avg_arrests">Avg. arrests each</button>
@@ -319,7 +349,7 @@
         </div>
         <div class="panel" id="map-detail">
           <h3 style="font-size:16px;">Hover or tap a precinct</h3>
-          <p class="psub" style="margin:0;">Only officers in numbered patrol-precinct commands appear on this map — about 13,000 of the 34,000-strong force. Housing, transit, headquarters and specialized units aren't precinct-based.</p>
+          <p class="psub" style="margin:0;">Only officers assigned to a patrol precinct appear here — about 13,200 of the 34,000-strong force. Housing, transit, headquarters, the academy and specialized units aren't precinct-based.</p>
         </div>
       </div>
     </div>
@@ -339,7 +369,7 @@
           <tr><td>Members of Service (roster)</td><td><code>pmsy-ewrc</code></td><td>34,237</td><td>Every view; the officer list</td></tr>
           <tr><td>Title / Shield History</td><td><code>sh6y-4tgb</code></td><td>~53,000</td><td>Per-officer career timeline (live)</td></tr>
           <tr><td>Training</td><td><code>n3mp-t5uj</code></td><td>~12.7 million</td><td>Aggregate training chart only</td></tr>
-          <tr><td>Department Recognition</td><td><code>i9n8-a8ed</code></td><td>~144,000</td><td>Awards chart; the decorated</td></tr>
+          <tr><td>Department Recognition</td><td><code>i9n8-a8ed</code></td><td>141,235</td><td>Awards chart; the decorated</td></tr>
           <tr><td>Disciplinary History — Summary</td><td><code>wq9a-qu9a</code></td><td>1,543</td><td>Recomputed from charges</td></tr>
           <tr><td>Disciplinary History — Charges</td><td><code>uafj-ik29</code></td><td>3,925</td><td>Discipline view; per-officer</td></tr>
         </tbody>
@@ -351,7 +381,8 @@
         <li><b>Discipline is guilty findings only.</b> All 3,925 charges carry a guilty, pleaded-guilty or no-contest disposition. Dismissed, unsubstantiated and pending matters are absent, as are all Civilian Complaint Review Board complaints. Absence of a record here is <em>not</em> proof of a spotless history.</li>
         <li><b>It's a live snapshot of active officers.</b> Retired or separated members drop off entirely — this is not a historical roster of everyone who ever served. Medal-holders who have left the force are not counted among "the decorated."</li>
         <li><b>Arrests and recognitions are pre-totalled.</b> The department publishes lifetime cumulative counts, so they can't be sliced by year from this data alone.</li>
-        <li><b>The precinct map covers patrol precincts only.</b> Officer commands were mapped to a precinct by parsing commands like <code>075 PRECINCT</code>. About 13,000 of 34,237 officers sit in numbered precincts; the rest are in housing, transit, headquarters or specialized units and are not on the map.</li>
+        <li><b>The precinct map covers patrol precincts only.</b> Officer commands were mapped to a precinct by parsing commands like <code>075 PRECINCT</code>, with the Central Park precinct (the 22nd) matched by name. About 13,167 of 34,237 officers sit in a patrol precinct; the rest are in housing, transit, headquarters, the academy or specialized units and are not on the map. The boundary file contains 78 precinct areas.</li>
+        <li><b>Two ways to count recognitions.</b> The awards chart and the "recognitions awarded" figure (141,235) count individual award records in the recognition dataset. The department also keeps a per-officer recognition counter whose values sum slightly higher, to 144,444; the difference is a quirk of how the two are maintained.</li>
         <li><b>Training records contain known data-entry errors,</b> per the department's own dataset description, so the training chart is best read as broad scale, not exact tallies.</li>
         <li><b>Officer names are published by the department.</b> This site republishes only what the NYPD already releases publicly, and adds no new personal information.</li>
       </ul>
@@ -460,7 +491,7 @@ async function initOverview(){
   $("#ov-stats").innerHTML = [
     [fmt(STATS.officers),"Active uniformed officers"],
     [fmt(STATS.total_arrests),"Lifetime arrests, all officers"],
-    [fmt(STATS.total_recognitions),"Department recognitions awarded"],
+    [fmt(STATS.recognitions_awarded),"Department recognitions awarded"],
     [fmt(STATS.disciplined_officers),`Officers with a sustained charge (${STATS.disciplined_pct}%)`],
     [fmt(STATS.high_honor_awards),"Top valor &amp; merit medals"],
   ].map(([n,l])=>`<div class="stat"><div class="num">${n}</div><div class="lab">${l}</div></div>`).join("");
@@ -483,7 +514,7 @@ function windowedList(bodyEl, sentinelEl, rowFn, chunk=120){
 }
 
 /* ---------- Officers ---------- */
-let ROSTER=null, offList=null;
+let ROSTER=null, offList=null, precinctFilter=null;
 function rosterObjs(d){const c=d.cols;return d.rows.map(r=>{const o={};c.forEach((k,i)=>o[k]=r[i]);return o;});}
 async function loadOfficers(){
   if(loaded.officers) return; loaded.officers=true;
@@ -498,7 +529,8 @@ async function loadOfficers(){
       `<td class="num">${o.year||"—"}</td><td class="num">${fmt(o.arr??o.arrests)}</td>`+
       `<td class="num">${fmt(o.rec??o.recognitions)}</td>`+
       `<td class="num">${o.chg||o.charges?('<span class="pill r">'+(o.chg??o.charges)+'</span>'):'0'}</td></tr>`);
-    ["off-q","off-rank","off-sort","off-disc"].forEach(id=>$("#"+id).addEventListener("input",filterOfficers));
+    $("#off-q").addEventListener("input",()=>{precinctFilter=null;filterOfficers();});
+    ["off-rank","off-sort","off-disc"].forEach(id=>$("#"+id).addEventListener("input",filterOfficers));
     $("#off-table thead").addEventListener("click",e=>{const th=e.target.closest("th");if(!th)return;
       const map={name:"name",rank:"rank",command:"command",year:"new",arr:"arr",rec:"rec",chg:"chg"};
       if(map[th.dataset.k]){$("#off-sort").value=map[th.dataset.k];filterOfficers();}});
@@ -508,6 +540,7 @@ async function loadOfficers(){
 function filterOfficers(){
   const q=$("#off-q").value.trim().toLowerCase(), rank=$("#off-rank").value, sort=$("#off-sort").value, discOnly=$("#off-disc").checked;
   let list=ROSTER.filter(o=>{
+    if(precinctFilter!=null && o.precinct!==precinctFilter)return false;
     if(rank&&o.rank!==rank)return false;
     if(discOnly&&!o.charges)return false;
     if(q&&!(o.name.toLowerCase().includes(q)||(o.command||"").toLowerCase().includes(q)))return false;
@@ -516,9 +549,11 @@ function filterOfficers(){
   const S={arr:(a,b)=>b.arrests-a.arrests,rec:(a,b)=>b.recognitions-a.recognitions,chg:(a,b)=>b.charges-a.charges||b.arrests-a.arrests,
     ten:(a,b)=>(a.year||9999)-(b.year||9999),new:(a,b)=>(b.year||0)-(a.year||0),name:(a,b)=>a.name.localeCompare(b.name)};
   list.sort(S[sort]||S.arr);
-  $("#off-count").innerHTML=`<b>${fmt(list.length)}</b> officer${list.length===1?"":"s"}`;
+  const chip = precinctFilter!=null ? `Precinct ${precinctFilter}${precinctFilter===22?" (Central Park)":""} · <a href="#" onclick="clearPrecinct();return false;">show all</a> · ` : "";
+  $("#off-count").innerHTML=chip+`<b>${fmt(list.length)}</b> officer${list.length===1?"":"s"}`;
   offList.set(list);
 }
+function clearPrecinct(){precinctFilter=null;filterOfficers();}
 
 /* ---------- Discipline ---------- */
 let DISC=null, discList=null;
@@ -694,11 +729,12 @@ function mapClick(p){
 }
 function viewPrecinct(p){
   showTab("officers");
-  const set=()=>{$("#off-q").value=String(p).padStart(3,"0")+" PRECINCT";$("#off-disc").checked=false;filterOfficers();};
-  if(ROSTER) set(); else setTimeout(set,600);
+  const go=()=>{precinctFilter=p;$("#off-q").value="";$("#off-disc").checked=false;filterOfficers();};
+  if(ROSTER) go(); else setTimeout(go,700);
 }
 
 /* ---------- Go ---------- */
+addEventListener("scroll",()=>{$("#tabs").classList.toggle("scrolled",window.scrollY>150);},{passive:true});
 initOverview();
 </script>
 </body>

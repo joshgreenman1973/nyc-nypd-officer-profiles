@@ -18,7 +18,7 @@ rest hang off it. Precinct boundaries come from a seventh (City Planning) datase
 | Members of Service (roster) | `pmsy-ewrc` | 34,237 | The officer list; all headline stats |
 | Title / Shield History | `sh6y-4tgb` | ~53,000 | Per-officer career timeline (fetched live) |
 | Training | `n3mp-t5uj` | ~12.7 million | Aggregate training chart only |
-| Department Recognition | `i9n8-a8ed` | ~144,000 | Awards chart; "the decorated" |
+| Department Recognition | `i9n8-a8ed` | 141,235 | Awards chart; "the decorated" |
 | Disciplinary History — Summary | `wq9a-qu9a` | 1,543 | Recomputed here from the charges table |
 | Disciplinary History — Charges | `uafj-ik29` | 3,925 | Discipline view; per-officer discipline |
 | Police Precincts (boundaries) | `y76i-bdw7` | 78 | The precinct choropleth |
@@ -61,10 +61,16 @@ To rebuild: `python3 build.py` (standard library only, no API token required).
 - **Arrests and recognitions are lifetime cumulative totals** as published by the
   department; they cannot be broken out by year from this data alone.
 - **The precinct map covers patrol precincts only.** Commands were mapped to a precinct by
-  parsing strings like `075 PRECINCT`. About 13,072 of 34,237 officers sit in numbered
-  precincts; the rest (housing, transit, headquarters, academy recruits and specialized
-  units) are not on the map. Precinct averages are computed over precinct-assigned
-  officers only.
+  parsing strings like `075 PRECINCT`, with the Central Park precinct (the 22nd) matched by
+  name because its command carries no number. About 13,167 of 34,237 officers sit in a
+  patrol precinct; the rest (housing, transit, headquarters, academy recruits and
+  specialized units) are not on the map. The boundary file contains 78 precinct areas.
+  Precinct averages are computed over precinct-assigned officers only.
+- **Two ways to count recognitions.** The awards chart and the "recognitions awarded"
+  headline (141,235) count individual award records in `i9n8-a8ed`. The roster also carries
+  a per-officer recognition counter (`department_recognitions`) that sums to 144,444 —
+  slightly higher, a quirk of how the two are maintained. We use the itemized figure so the
+  headline and the chart agree.
 - **Training records contain known data-entry errors** per the department's own dataset
   description, so the training chart shows broad scale, not exact tallies.
 - **Officer names are published by the NYPD.** This site republishes only what the

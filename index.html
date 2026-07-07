@@ -258,6 +258,7 @@
     <div class="callout navy" style="margin-top:0;margin-bottom:16px;">
       <b>What time is this data for?</b> It's a <b>point-in-time snapshot the NYPD exported on <span id="snap-date">—</span></b>, and the department refreshes it every week. Every arrest and recognition figure is a <b>cumulative career total as of that date</b> — not a count for any single year. The force changes constantly as officers are hired and retire, so this is today's roster, not a historical record. The one place you can see genuine change over time is <a href="#" onclick="document.getElementById('trends').scrollIntoView({behavior:'smooth'});return false;">What changes over time</a>, below.
     </div>
+    <div class="callout" id="ov-headcount" style="margin-top:0;margin-bottom:16px;border-color:var(--gold);background:var(--gold-bg);box-shadow:5px 5px 0 rgba(154,123,31,.1);"></div>
     <div class="stats" id="ov-stats"></div>
     <p class="result-count" style="margin-top:8px;">Lifetime arrest and recognition totals are cumulative per officer, as reported by the department. "Sustained charge" means a disciplinary charge that ended in a guilty finding — see the caveat below.</p>
     <div class="grid2">
@@ -379,7 +380,7 @@
         </div>
         <div class="panel" id="map-detail">
           <h3 style="font-size:16px;">Hover or tap a precinct</h3>
-          <p class="psub" style="margin:0;">Only officers assigned to a patrol precinct appear here — about 13,200 of the 34,000-strong force. Housing, transit, headquarters, the academy and specialized units aren't precinct-based.</p>
+          <p class="psub" style="margin:0;">This counts patrol and field-training commands — about 13,200 of the 34,000-strong force. Housing, transit, headquarters, the academy (roughly 2,200 recruits) and specialized units aren't precinct-based. Note too that about 1,477 officers work in precinct-based detective and domestic-violence squads that sit outside this patrol count.</p>
         </div>
       </div>
     </div>
@@ -416,6 +417,15 @@
         <li><b>Two ways to count recognitions.</b> The awards table and the "recognitions awarded" figure (141,235) count individual award records in the recognition dataset. The department also keeps a per-officer recognition counter whose values sum slightly higher, to 144,444; the difference is a quirk of how the two are maintained.</li>
         <li><b>Training records contain known data-entry errors,</b> per the department's own dataset description, so the training chart is best read as broad scale, not exact tallies.</li>
         <li><b>Officer names are published by the department.</b> This site republishes only what the NYPD already releases publicly, and adds no new personal information.</li>
+      </ul>
+
+      <h3>Reading the headcount</h3>
+      <p>Total NYPD strength is a perennial fight at City Council budget hearings, and the raw 34,237 needs context before it is cited.</p>
+      <ul>
+        <li><b>Recruits are in the count.</b> 2,194 officers are in the "RTS RECRUITS" command — recruits in the Police Academy, and the single largest command on the force — plus about 126 in the Police Academy itself. They are counted as active members but are not deployed.</li>
+        <li><b>So are officers who aren't working.</b> 776 sit at the "Military &amp; Extended Leave Desk" — on military deployment or extended leave. Setting recruits and this group aside, the number available for duty is nearer 31,300 than 34,200.</li>
+        <li><b>Domestic-violence officers moved out of patrol.</b> About 504 officers work in domestic-violence assignments, 455 of them in precinct-based "domestic violence squads" that are organizationally separate from the precinct patrol roster. They carry a precinct number but are counted apart from patrol strength — the work stayed local even as the officers were reorganized.</li>
+        <li><b>Patrol strength is not the same as a precinct's footprint.</b> The precinct map counts patrol and field-training commands (13,167 officers). A further ~1,477 officers work in precinct-based detective and domestic-violence squads that fall outside that patrol count, so the map understates how many officers a precinct actually fields.</li>
       </ul>
 
       <h3>What time the data is for, and the trends</h3>
@@ -531,6 +541,8 @@ let STATS=null;
 async function initOverview(){
   STATS = await getJSON("data/stats.json");
   $("#asof").textContent = STATS.export_date; $("#asof2").textContent = STATS.export_date; $("#snap-date").textContent = STATS.export_date;
+  const st = STATS.staffing;
+  if(st) $("#ov-headcount").innerHTML = `<b>Before you cite "${fmt(st.total)} officers."</b> Police headcount is a running fight at City Council budget hearings, and the raw number carries footnotes the department rarely volunteers. <b>${fmt(st.recruits)}</b> of these officers are recruits still in the Police Academy — the "RTS RECRUITS" command is the single largest command on the entire force — and are not yet deployed. Another <b>${fmt(st.military_leave)}</b> sit at the Military &amp; Extended Leave Desk, on deployment or extended leave. Set those aside and the number available for duty is nearer <b>${fmt(st.available_est)}</b> than ${fmt(st.total)}. Separately, about <b>${fmt(st.dv_officers)}</b> domestic-violence officers now work in their own precinct squads, organizationally split from patrol — so precinct patrol counts understate who actually handles a precinct's cases. <a href="#" onclick="showTab('method');return false;">More in the methodology.</a>`;
   $("#ov-stats").innerHTML = [
     [fmt(STATS.officers),"Active uniformed officers"],
     [fmt(STATS.total_arrests),"Lifetime arrests, all officers"],

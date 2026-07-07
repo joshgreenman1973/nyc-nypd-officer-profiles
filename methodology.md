@@ -81,6 +81,28 @@ To rebuild: `python3 build.py` (standard library only, no API token required).
 - **Officer names are published by the NYPD.** This site republishes only what the
   department already releases and adds no new personal information.
 
+## Reading the headcount
+
+Total NYPD strength is a perennial fight at City Council budget hearings, and the raw
+34,237 needs context before it is cited:
+
+- **Recruits are in the count.** 2,194 officers are in the `RTS RECRUITS` command —
+  recruits in the Police Academy, and the single largest command on the whole force —
+  plus about 126 in the Police Academy itself. They are active members but not deployed.
+- **So are officers who aren't working.** 776 sit at the `MILITARY & EXTENDED LEAVE DESK`,
+  on military deployment or extended leave. Setting recruits and this group aside, the
+  number available for duty is nearer 31,300 than 34,200.
+- **Domestic-violence officers moved out of patrol.** About 504 officers hold
+  domestic-violence assignments, 455 of them in precinct-numbered `DOMESTIC VIOLENCE SQUAD`
+  commands that are organizationally separate from the precinct patrol roster. The work
+  stayed local even as the officers were reorganized out of patrol.
+- **Patrol strength is not a precinct's full footprint.** The precinct map counts patrol
+  and field-training commands (13,167 officers). Another ~1,477 work in precinct-based
+  detective and domestic-violence squads that fall outside that patrol count.
+
+These figures are computed from the `command` field in the roster and are exposed in
+`stats.json` under `staffing`.
+
 ## Reading the charts
 
 All counts start at zero. The awards chart uses a **log scale** because Excellent and

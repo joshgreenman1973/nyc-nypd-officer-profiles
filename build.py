@@ -211,6 +211,26 @@ by_rank.sort(key=lambda x: -x["avg"])
 by_tenure = [{"band": b, "n": ten_n[b], "avg": round(ten_arr[b]/ten_n[b], 1),
               "per_year": round(ten_arr[b]/ten_yrs[b], 1)} for b in TEN_ORDER if ten_n[b]]
 
+# ---- staffing caveats: what the 34,237 headcount does and doesn't include ----
+cmd_list = [(r[3] or "") for r in rows]
+numre = re.compile(r"^(\d{1,3})\b")
+recruits = sum(1 for c in cmd_list if c.strip().upper() == "RTS RECRUITS")
+academy = sum(1 for c in cmd_list if "POLICE ACADEMY" in c.upper())
+military_leave = sum(1 for c in cmd_list if "MILITARY" in c.upper() and "LEAVE" in c.upper())
+dv_officers = sum(1 for c in cmd_list if "DOMESTIC VIOLENCE" in c.upper())
+dv_precinct_squads = sum(1 for c in cmd_list if "DOMESTIC VIOLENCE SQUAD" in c.upper() and numre.match(c))
+prec_any = sum(1 for c in cmd_list if (numre.match(c) and 1 <= to_int(numre.match(c).group(1)) <= 123))
+prec_num_mapped = sum(1 for r in rows if r[8] and numre.match(r[3] or ""))
+staffing = {
+    "total": len(rows),
+    "recruits": recruits, "academy": academy, "military_leave": military_leave,
+    "available_est": len(rows) - recruits - military_leave,
+    "dv_officers": dv_officers, "dv_precinct_squads": dv_precinct_squads,
+    "precinct_patrol": sum(1 for r in rows if r[8]),
+    "precinct_any": prec_any,
+    "precinct_squads_extra": prec_any - prec_num_mapped,  # det + DV squads not in the patrol count
+}
+
 arrests_break = {
     "total": tot_a, "mean": round(tot_a/n, 1), "median": median(arrs),
     "p90": asc[int(.9*n)], "max": desc[0],
@@ -261,6 +281,7 @@ stats = {
     "charges_by_year": charges_by_year,
     "honors_by_year": honors_by_year,
     "arrests": arrests_break,
+    "staffing": staffing,
 }
 
 # --------------------------------------------------------------------------

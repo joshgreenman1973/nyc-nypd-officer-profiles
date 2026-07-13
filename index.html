@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The NYPD, officer by officer</title>
-<meta name="description" content="An interactive explorer of the New York Police Department's own weekly Officer Profile data — 34,237 active officers, their ranks, arrests, medals and sustained discipline.">
+<meta name="description" content="An interactive explorer of the New York Police Department's own weekly Officer Profile data — every active officer, their ranks, arrests, medals and sustained discipline.">
 <style>
   :root{
     --ink:#15181d; --ink-soft:#3c434d; --muted:#6b7280; --faint:#9aa1ab;
@@ -282,7 +282,7 @@
       <div class="panel" style="margin-top:20px;"><h3>Top medals awarded, by year</h3><p class="psub">The six highest valor and merit honors, held by officers on today's force, by the year the medal was awarded. Only medals belonging to still-active officers appear, so earlier years understate the totals.</p><div id="ov-honors" class="linechart"></div></div>
     </div>
     <div class="callout">
-      <b>The single most important caveat.</b> The disciplinary data published here contains <b>only charges that ended in a guilty finding</b> — every one of the 3,925 charges has a disposition of guilty, pleaded guilty or no contest. Allegations that were dismissed, unsubstantiated or are still pending do <b>not</b> appear, and civilian complaints to the Civilian Complaint Review Board live in a separate system entirely. An officer with no record here has no <em>sustained departmental charge</em> — which is not the same as a clean complaint history.
+      <b>The single most important caveat.</b> The disciplinary data published here contains <b>only charges that ended in a guilty finding</b> — every one of the <span data-stat="total_charges">3,925</span> charges has a disposition of guilty, pleaded guilty or no contest. Allegations that were dismissed, unsubstantiated or are still pending do <b>not</b> appear, and civilian complaints to the Civilian Complaint Review Board live in a separate system entirely. An officer with no record here has no <em>sustained departmental charge</em> — which is not the same as a clean complaint history.
     </div>
   </section>
 
@@ -331,7 +331,7 @@
 
   <!-- DISCIPLINE -->
   <section class="view" id="discipline-view">
-    <div class="view-intro"><h2>Sustained discipline</h2><p>Every one of the 3,925 disciplinary charges the department has published — all of which ended in a guilty finding. Each row is a single charge; one incident can produce several.</p></div>
+    <div class="view-intro"><h2>Sustained discipline</h2><p>Every one of the <span data-stat="total_charges">3,925</span> disciplinary charges the department has published — all of which ended in a guilty finding. Each row is a single charge; one incident can produce several.</p></div>
     <div class="callout" style="margin-top:0;margin-bottom:18px;">Guilty findings only. Dismissed, unproven and pending matters are not in this dataset, and neither are Civilian Complaint Review Board complaints. Read this as the record of <b>proven, adjudicated</b> departmental discipline, not the universe of allegations.</div>
     <div class="controls">
       <input type="search" id="disc-q" placeholder="Search name, charge or command…">
@@ -380,7 +380,7 @@
         </div>
         <div class="panel" id="map-detail">
           <h3 style="font-size:16px;">Hover or tap a precinct</h3>
-          <p class="psub" style="margin:0;">This counts patrol and field-training commands — about 13,200 of the 34,000-strong force. Housing, transit, headquarters, the academy (roughly 2,200 recruits) and specialized units aren't precinct-based. Note too that about 1,477 officers work in precinct-based detective and domestic-violence squads that sit outside this patrol count.</p>
+          <p class="psub" style="margin:0;">This counts patrol and field-training commands — about <span data-stat="staffing.precinct_patrol">13,200</span> of the <span data-stat="officers">34,000</span>-strong force. Housing, transit, headquarters, the academy (<span data-stat="staffing.recruits">2,200</span> recruits) and specialized units aren't precinct-based. Note too that about <span data-stat="staffing.precinct_squads_extra">1,477</span> officers work in precinct-based detective and domestic-violence squads that sit outside this patrol count.</p>
         </div>
       </div>
     </div>
@@ -397,35 +397,35 @@
       <table class="srctable">
         <thead><tr><th>Dataset</th><th>ID</th><th>Rows</th><th>Used for</th></tr></thead>
         <tbody>
-          <tr><td>Members of Service (roster)</td><td><code>pmsy-ewrc</code></td><td>34,237</td><td>Every view; the officer list</td></tr>
-          <tr><td>Title / Shield History</td><td><code>sh6y-4tgb</code></td><td>~53,000</td><td>Per-officer career timeline (live)</td></tr>
-          <tr><td>Training</td><td><code>n3mp-t5uj</code></td><td>~12.7 million</td><td>Aggregate training chart only</td></tr>
-          <tr><td>Department Recognition</td><td><code>i9n8-a8ed</code></td><td>141,235</td><td>Awards chart; the decorated</td></tr>
-          <tr><td>Disciplinary History — Summary</td><td><code>wq9a-qu9a</code></td><td>1,543</td><td>Recomputed from charges</td></tr>
-          <tr><td>Disciplinary History — Charges</td><td><code>uafj-ik29</code></td><td>3,925</td><td>Discipline view; per-officer</td></tr>
+          <tr><td>Members of Service (roster)</td><td><code>pmsy-ewrc</code></td><td data-stat="source_rows.roster">34,237</td><td>Every view; the officer list</td></tr>
+          <tr><td>Title / Shield History</td><td><code>sh6y-4tgb</code></td><td data-stat="source_rows.title_history">~53,000</td><td>Per-officer career timeline (live)</td></tr>
+          <tr><td>Training</td><td><code>n3mp-t5uj</code></td><td data-stat="source_rows.training">~12.7 million</td><td>Aggregate training chart only</td></tr>
+          <tr><td>Department Recognition</td><td><code>i9n8-a8ed</code></td><td data-stat="source_rows.recognition">141,235</td><td>Awards chart; the decorated</td></tr>
+          <tr><td>Disciplinary History — Summary</td><td><code>wq9a-qu9a</code></td><td data-stat="source_rows.discipline_summary">1,543</td><td>Recomputed from charges</td></tr>
+          <tr><td>Disciplinary History — Charges</td><td><code>uafj-ik29</code></td><td data-stat="source_rows.discipline_charges">3,925</td><td>Discipline view; per-officer</td></tr>
         </tbody>
       </table>
       <p>Precinct boundaries are the City Planning "Police Precincts" file (<code>y76i-bdw7</code>), simplified for the web.</p>
 
       <h3>What to keep in mind</h3>
       <ul>
-        <li><b>Discipline is guilty findings only.</b> All 3,925 charges carry a guilty, pleaded-guilty or no-contest disposition. Dismissed, unsubstantiated and pending matters are absent, as are all Civilian Complaint Review Board complaints. Absence of a record here is <em>not</em> proof of a spotless history.</li>
+        <li><b>Discipline is guilty findings only.</b> All <span data-stat="total_charges">3,925</span> charges carry a guilty, pleaded-guilty or no-contest disposition. Dismissed, unsubstantiated and pending matters are absent, as are all Civilian Complaint Review Board complaints. Absence of a record here is <em>not</em> proof of a spotless history.</li>
         <li><b>It's a live snapshot of active officers.</b> Retired or separated members drop off entirely — this is not a historical roster of everyone who ever served. Medal-holders who have left the force are not counted among "the decorated."</li>
         <li><b>Arrests and recognitions are pre-totalled.</b> The department publishes lifetime cumulative counts, so they can't be sliced by year from this data alone.</li>
-        <li><b>The precinct map covers patrol precincts only.</b> Officer commands were mapped to a precinct by parsing commands like <code>075 PRECINCT</code>, with the Central Park precinct (the 22nd) matched by name. About 13,167 of 34,237 officers sit in a patrol precinct; the rest are in housing, transit, headquarters, the academy or specialized units and are not on the map. The boundary file contains 78 precinct areas.</li>
-        <li><b>Awards given vs officers who hold them.</b> The same officer can receive an award many times, so the count of awards is far larger than the number of recipients — Excellent Police Duty is given 91,330 times but to 16,468 officers (about 5.5 each). The awards table shows both figures side by side. The medals, by contrast, are almost one-per-officer.</li>
-        <li><b>Two ways to count recognitions.</b> The awards table and the "recognitions awarded" figure (141,235) count individual award records in the recognition dataset. The department also keeps a per-officer recognition counter whose values sum slightly higher, to 144,444; the difference is a quirk of how the two are maintained.</li>
+        <li><b>The precinct map covers patrol precincts only.</b> Officer commands were mapped to a precinct by parsing commands like <code>075 PRECINCT</code>, with the Central Park precinct (the 22nd) matched by name. About <span data-stat="staffing.precinct_patrol">13,167</span> of <span data-stat="officers">34,237</span> officers sit in a patrol precinct; the rest are in housing, transit, headquarters, the academy or specialized units and are not on the map. The boundary file contains <span data-stat="source_rows.precincts">78</span> precinct areas.</li>
+        <li><b>Awards given vs officers who hold them.</b> The same officer can receive an award many times, so the count of awards is far larger than the number of recipients — Excellent Police Duty is given <span id="m-exc-n">91,330</span> times but to <span id="m-exc-off">16,468</span> officers (about <span id="m-exc-each">5.5</span> each). The awards table shows both figures side by side. The medals, by contrast, are almost one-per-officer.</li>
+        <li><b>Two ways to count recognitions.</b> The awards table and the "recognitions awarded" figure (<span data-stat="recognitions_awarded">141,235</span>) count individual award records in the recognition dataset. The department also keeps a per-officer recognition counter whose values sum slightly higher, to <span data-stat="total_recognitions">144,444</span>; the difference is a quirk of how the two are maintained.</li>
         <li><b>Training records contain known data-entry errors,</b> per the department's own dataset description, so the training chart is best read as broad scale, not exact tallies.</li>
         <li><b>Officer names are published by the department.</b> This site republishes only what the NYPD already releases publicly, and adds no new personal information.</li>
       </ul>
 
       <h3>Reading the headcount</h3>
-      <p>Total NYPD strength is a perennial fight at City Council budget hearings, and the raw 34,237 needs context before it is cited.</p>
+      <p>Total NYPD strength is a perennial fight at City Council budget hearings, and the raw <span data-stat="officers">34,237</span> needs context before it is cited.</p>
       <ul>
-        <li><b>Recruits are in the count.</b> 2,194 officers are in the "RTS RECRUITS" command — recruits in the Police Academy, and the single largest command on the force — plus about 126 in the Police Academy itself. They are counted as active members but are not deployed.</li>
-        <li><b>So are officers who aren't working.</b> 776 sit at the "Military &amp; Extended Leave Desk" — on military deployment or extended leave. Setting recruits and this group aside, the number available for duty is nearer 31,300 than 34,200.</li>
-        <li><b>Domestic-violence officers moved out of patrol.</b> About 504 officers work in domestic-violence assignments, 455 of them in precinct-based "domestic violence squads" that are organizationally separate from the precinct patrol roster. They carry a precinct number but are counted apart from patrol strength — the work stayed local even as the officers were reorganized.</li>
-        <li><b>Patrol strength is not the same as a precinct's footprint.</b> The precinct map counts patrol and field-training commands (13,167 officers). A further ~1,477 officers work in precinct-based detective and domestic-violence squads that fall outside that patrol count, so the map understates how many officers a precinct actually fields.</li>
+        <li><b>Recruits are in the count.</b> <span data-stat="staffing.recruits">2,194</span> officers are in the "RTS RECRUITS" command — recruits in the Police Academy, and the single largest command on the force — plus about <span data-stat="staffing.academy">126</span> in the Police Academy itself. They are counted as active members but are not deployed.</li>
+        <li><b>So are officers who aren't working.</b> <span data-stat="staffing.military_leave">776</span> sit at the "Military &amp; Extended Leave Desk" — on military deployment or extended leave. Setting recruits and this group aside, the number available for duty is nearer <span data-stat="staffing.available_est">31,300</span> than <span data-stat="officers">34,200</span>.</li>
+        <li><b>Domestic-violence officers moved out of patrol.</b> About <span data-stat="staffing.dv_officers">504</span> officers work in domestic-violence assignments, <span data-stat="staffing.dv_precinct_squads">455</span> of them in precinct-based "domestic violence squads" that are organizationally separate from the precinct patrol roster. They carry a precinct number but are counted apart from patrol strength — the work stayed local even as the officers were reorganized.</li>
+        <li><b>Patrol strength is not the same as a precinct's footprint.</b> The precinct map counts patrol and field-training commands (<span data-stat="staffing.precinct_patrol">13,167</span> officers). A further ~<span data-stat="staffing.precinct_squads_extra">1,477</span> officers work in precinct-based detective and domestic-violence squads that fall outside that patrol count, so the map understates how many officers a precinct actually fields.</li>
       </ul>
 
       <h3>What time the data is for, and the trends</h3>
@@ -537,10 +537,26 @@ function renderAwards(el, items){
         `<td class="num off">${fmt(it.officers)}</td></tr>`;
     }).join("")+`</tbody></table>`;
 }
+/* Fill every prose number from stats.json so the copy can never drift out of
+   sync with the weekly data refresh. Spans carry data-stat="dotted.path". */
+function fillStaticNumbers(S){
+  const get=(o,path)=>path.split(".").reduce((v,k)=>v==null?v:v[k],o);
+  document.querySelectorAll("[data-stat]").forEach(el=>{
+    const v=get(S,el.dataset.stat);
+    if(v!=null&&!isNaN(v)) el.textContent=fmt(v);
+  });
+  const exc=(S.awards||[]).find(a=>a.award==="EXCELLENT POLICE DUTY");
+  if(exc){
+    const set=(id,val)=>{const e=document.getElementById(id);if(e)e.textContent=val;};
+    set("m-exc-n",fmt(exc.n)); set("m-exc-off",fmt(exc.officers));
+    set("m-exc-each",exc.officers?(exc.n/exc.officers).toFixed(1):"—");
+  }
+}
 let STATS=null;
 async function initOverview(){
   STATS = await getJSON("data/stats.json");
   $("#asof").textContent = STATS.export_date; $("#asof2").textContent = STATS.export_date; $("#snap-date").textContent = STATS.export_date;
+  fillStaticNumbers(STATS);
   const st = STATS.staffing;
   if(st) $("#ov-headcount").innerHTML = `<b>Before you cite "${fmt(st.total)} officers."</b> Police headcount is a running fight at City Council budget hearings, and the raw number carries footnotes the department rarely volunteers. <b>${fmt(st.recruits)}</b> of these officers are recruits still in the Police Academy — the "RTS RECRUITS" command is the single largest command on the entire force — and are not yet deployed. Another <b>${fmt(st.military_leave)}</b> sit at the Military &amp; Extended Leave Desk, on deployment or extended leave. Set those aside and the number available for duty is nearer <b>${fmt(st.available_est)}</b> than ${fmt(st.total)}. Separately, about <b>${fmt(st.dv_officers)}</b> domestic-violence officers now work in their own precinct squads, organizationally split from patrol — so precinct patrol counts understate who actually handles a precinct's cases. <a href="#" onclick="showTab('method');return false;">More in the methodology.</a>`;
   $("#ov-stats").innerHTML = [

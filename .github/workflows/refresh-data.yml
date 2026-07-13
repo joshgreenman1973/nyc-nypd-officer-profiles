@@ -32,7 +32,9 @@ jobs:
 
       - name: Commit and push if data changed
         run: |
-          if git diff --quiet -- data/; then
+          # build.py regenerates data/ and methodology.md from the same pull,
+          # so both must be checked and committed together to stay in sync.
+          if git diff --quiet -- data/ methodology.md; then
             echo "No data changes — nothing to commit."
             exit 0
           fi
@@ -40,6 +42,6 @@ jobs:
           officers=$(python3 -c "import json;print(json.load(open('data/stats.json'))['officers'])")
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/
+          git add data/ methodology.md
           git commit -m "Auto-refresh officer data to ${export_date} pull (${officers} officers)"
           git push

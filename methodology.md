@@ -1,8 +1,9 @@
 # The NYPD, officer by officer — methodology
 
 An interactive explorer built entirely from the New York Police Department's own
-**Officer Profile** datasets, which the department began publishing on NYC Open Data in
-September 2025 and refreshes weekly. Nothing here is estimated or hand-entered: every
+**Officer Profile** datasets, which the department publishes on NYC Open Data (the roster
+dataset was added in 2024, disciplinary records in 2021) and refreshes weekly. Nothing here
+is estimated or hand-entered: every
 figure is computed directly from the source data at build time, and per-officer detail is
 fetched live from the city's servers when you open an officer.
 

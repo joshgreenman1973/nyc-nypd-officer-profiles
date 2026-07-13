@@ -1,0 +1,45 @@
+name: Refresh officer data
+
+# Rebuilds the baked JSON from the NYPD Officer Profile SODA API and pushes
+# only when the data actually changes. Runs on a daily check so the weekly
+# NYPD update is picked up within a day no matter which day it lands; days
+# with no change produce no commit. Can also be triggered by hand.
+
+on:
+  schedule:
+    - cron: "0 11 * * *"   # 11:00 UTC daily (~7am ET)
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: refresh-data
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Rebuild data
+        run: python3 build.py
+
+      - name: Commit and push if data changed
+        run: |
+          if git diff --quiet -- data/; then
+            echo "No data changes — nothing to commit."
+            exit 0
+          fi
+          export_date=$(python3 -c "import json;print(json.load(open('data/stats.json'))['export_date'])")
+          officers=$(python3 -c "import json;print(json.load(open('data/stats.json'))['officers'])")
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/
+          git commit -m "Auto-refresh officer data to ${export_date} pull (${officers} officers)"
+          git push

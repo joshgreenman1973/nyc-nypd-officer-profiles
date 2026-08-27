@@ -57,16 +57,16 @@ def precinct_of(command):
     return to_int(m.group(1)) if m else None
 
 # --------------------------------------------------------------------------
-print("1/7  Roster (Members of Service)…")
+print("1/9  Roster (Members of Service)…")
 roster = soda("pmsy-ewrc", {
-    "$select": "profile_id,name,rank,command,appointment_date,arrests_total,department_recognitions,export_date",
+    "$select": "profile_id,name,rank,command,shield,appointment_date,arrests_total,department_recognitions,export_date",
     "$limit": 60000,
 })
 print(f"     {len(roster):,} officers")
 export_date = (roster[0].get("export_date") or "")[:10] if roster else ""
 
 # --------------------------------------------------------------------------
-print("2/7  Disciplinary charges…")
+print("2/9  Disciplinary charges…")
 charges = soda("uafj-ik29", {"$select": "profile_id,date,case_number,charge_description,disposition,penalty_and_quantity", "$limit": 60000})
 print(f"     {len(charges):,} charges")
 
@@ -74,7 +74,7 @@ sustained = Counter(c["profile_id"] for c in charges if c.get("profile_id"))
 disp_ct = Counter((c.get("disposition") or "—").strip().upper() for c in charges)
 
 # --------------------------------------------------------------------------
-print("3/7  Recognition records (awards + distinct recipients)…")
+print("3/9  Recognition records (awards + distinct recipients)…")
 recog_all = soda("i9n8-a8ed", {"$select": "profile_id,award", "$limit": 300000})
 print(f"     {len(recog_all):,} award records")
 award_ct = Counter(r["award"] for r in recog_all if r.get("award"))
@@ -93,7 +93,7 @@ honor_rows = soda("i9n8-a8ed", {
 print(f"     {len(honor_rows):,} high-honor awards")
 
 # --------------------------------------------------------------------------
-print("4/7  Training aggregate…")
+print("4/9  Training aggregate…")
 training_agg = soda("n3mp-t5uj", {"$select": "training,count(*) as n", "$group": "training", "$order": "n desc", "$limit": 60})
 training_summary = [{"training": t["training"], "n": to_int(t["n"])} for t in training_agg if t.get("training")]
 
@@ -107,11 +107,11 @@ disc_summary_rows = count_of("wq9a-qu9a")
 training_rows = count_of("n3mp-t5uj")
 
 # --------------------------------------------------------------------------
-print("5/7  Precinct boundaries…")
+print("5/9  Precinct boundaries…")
 precincts_geo = soda("y76i-bdw7", {"$limit": 200}, geojson=True)
 
 # --------------------------------------------------------------------------
-print("6/7  Assembling roster + per-precinct stats…")
+print("6/9  Assembling roster + per-precinct stats…")
 by_id = {}
 COLS = ["profile_id", "name", "rank", "command", "year", "arrests", "recognitions", "charges", "precinct"]
 rows = []
@@ -174,7 +174,7 @@ decorated = sorted(dec_by_officer.values(), key=lambda x: (-len(x["awards"]), x[
 honor_counts = Counter(h.get("award") for h in honor_rows)
 
 # --------------------------------------------------------------------------
-print("7/7  Overall stats…")
+print("7/9  Overall stats…")
 tot_arrests = sum(r[5] for r in rows)
 tot_recognitions = sum(r[6] for r in rows)
 disciplined_officers = sum(1 for r in rows if r[7] > 0)
@@ -320,6 +320,239 @@ for feat in precincts_geo.get("features", []):
         g["coordinates"] = round_coords(g["coordinates"])
     feat["properties"] = {"precinct": to_int(feat.get("properties", {}).get("precinct"))}
 
+# --------------------------------------------------------------------------
+# 8  Civilian Complaint Review Board.
+#
+# The NYPD's own discipline tables carry guilty findings only. The CCRB — a separate
+# agency with its own case numbering — publishes every civilian allegation, what it
+# concluded, and what penalty (if any) the NYPD then imposed. There is no shared key
+# between the two systems: the NYPD publishes profile_id, the CCRB publishes tax_id.
+# They are joined here on name plus shield, and only where that is unambiguous on both
+# sides. Unmatched officers are reported, never guessed at.
+print("8/9  Civilian Complaint Review Board…")
+
+def soda_paged(dataset, select, page=50000, cap=800000):
+    """Page a large table. Raises rather than returning a partial pull."""
+    out, offset = [], 0
+    while offset < cap:
+        chunk = soda(dataset, {"$select": select, "$order": ":id", "$limit": page, "$offset": offset})
+        out.extend(chunk)
+        if len(chunk) < page:
+            return out
+        offset += page
+    raise RuntimeError(f"{dataset}: hit the {cap:,}-row cap; raise it rather than truncating")
+
+ccrb_officers = soda_paged("2fir-qns4",
+    "tax_id,officer_first_name,officer_last_name,shield_no,active_per_last_reported_status,"
+    "total_complaints,total_substantiated_complaints,as_of_date")
+print(f"     {len(ccrb_officers):,} CCRB officer records")
+allegations = soda_paged("6xgr-kwjq",
+    "complaint_id,tax_id,fado_type,allegation,ccrb_allegation_disposition,officer_command_at_incident")
+print(f"     {len(allegations):,} allegations")
+complaints = soda_paged("2mby-ccnw",
+    "complaint_id,incident_date,precinct_of_incident_occurrence,borough_of_incident_occurrence,"
+    "ccrb_complaint_disposition,bwc_evidence,video_evidence,reason_for_police_contact")
+print(f"     {len(complaints):,} complaints")
+penalties = soda_paged("keep-pkmh", "complaint_id,tax_id,nypd_officer_penalty,board_discipline_recommendation")
+print(f"     {len(penalties):,} penalty records")
+if not (len(ccrb_officers) > 50000 and len(allegations) > 300000 and len(complaints) > 100000):
+    raise RuntimeError("CCRB pull came back short — refusing to publish a partial complaint history")
+
+def name_key(nypd_name):
+    """'GILLIAM, STEPHEN W' -> ('GILLIAM', 'STEPHEN')"""
+    if "," not in (nypd_name or ""):
+        return ((nypd_name or "").strip().upper(), "")
+    last, rest = nypd_name.split(",", 1)
+    parts = rest.strip().split()
+    return (last.strip().upper(), parts[0].upper() if parts else "")
+
+def shield_key(s):
+    s = (s or "").strip().lstrip("0")
+    return s or None
+
+nypd_by3, nypd_by2 = defaultdict(list), defaultdict(list)
+for o in roster:
+    last, first = name_key(o.get("name"))
+    nypd_by3[(last, first, shield_key(o.get("shield")))].append(o["profile_id"])
+    nypd_by2[(last, first)].append(o["profile_id"])
+
+ccrb_by3, ccrb_by2 = defaultdict(list), defaultdict(list)
+for o in ccrb_officers:
+    last = (o.get("officer_last_name") or "").strip().upper()
+    first = (o.get("officer_first_name") or "").strip().upper()
+    ccrb_by3[(last, first, shield_key(o.get("shield_no")))].append(o)
+    ccrb_by2[(last, first)].append(o)
+
+pid_for_tax, tax_for_pid = {}, {}
+for k, pids in nypd_by3.items():
+    if k[2] and len(pids) == 1 and len(ccrb_by3.get(k, [])) == 1:
+        tax = ccrb_by3[k][0]["tax_id"]
+        pid_for_tax[tax] = pids[0]; tax_for_pid[pids[0]] = tax
+for k, pids in nypd_by2.items():           # fall back to name alone, still only when unique
+    if len(pids) == 1 and pids[0] not in tax_for_pid and len(ccrb_by2.get(k, [])) == 1:
+        tax = ccrb_by2[k][0]["tax_id"]
+        if tax not in pid_for_tax:
+            pid_for_tax[tax] = pids[0]; tax_for_pid[pids[0]] = tax
+matched = len(tax_for_pid)
+print(f"     matched {matched:,} of {len(roster):,} active officers to a CCRB record")
+
+FADO_KEYS = ["Force", "Abuse of Authority", "Discourtesy", "Offensive Language", "Untruthful Statement"]
+SUBSTANTIATED = lambda d: (d or "").startswith("Substantiated")
+
+alleg_by_tax = defaultdict(lambda: {"n": 0, "sub": 0, "fado": Counter()})
+for a in allegations:
+    t = a.get("tax_id")
+    if not t:
+        continue
+    rec = alleg_by_tax[t]
+    rec["n"] += 1
+    rec["fado"][a.get("fado_type") or "—"] += 1
+    if SUBSTANTIATED(a.get("ccrb_allegation_disposition")):
+        rec["sub"] += 1
+
+CCRB_COLS = ["tax_id", "allegations", "substantiated", "complaints", "sub_complaints"] + FADO_KEYS
+by_pid = {}
+ccrb_officer_by_tax = {o["tax_id"]: o for o in ccrb_officers if o.get("tax_id")}
+for pid, tax in tax_for_pid.items():
+    rec = alleg_by_tax.get(tax)
+    off = ccrb_officer_by_tax.get(tax, {})
+    comp = to_int(off.get("total_complaints"))
+    subc = to_int(off.get("total_substantiated_complaints"))
+    if not rec and not comp:
+        continue                           # matched, but never had a complaint — nothing to store
+    fado = (rec or {}).get("fado", Counter())
+    by_pid[pid] = [tax, (rec or {}).get("n", 0), (rec or {}).get("sub", 0), comp, subc] + \
+                  [fado.get(k, 0) for k in FADO_KEYS]
+
+# ---- citywide aggregates ----
+comp_by_id = {c["complaint_id"]: c for c in complaints if c.get("complaint_id")}
+year_of_complaint = {cid: (c.get("incident_date") or "")[:4] for cid, c in comp_by_id.items()}
+
+fado_counts = Counter(a.get("fado_type") or "—" for a in allegations)
+allegation_counts = Counter(a.get("allegation") or "—" for a in allegations)
+disp_counts = Counter(a.get("ccrb_allegation_disposition") or "—" for a in allegations)
+penalty_counts = Counter((p.get("nypd_officer_penalty") or "Not yet reported").strip() for p in penalties)
+
+# Complaint outcomes by year of incident, so the trend is about when things happened.
+by_year = defaultdict(lambda: {"complaints": 0, "substantiated": 0})
+for c in complaints:
+    y = (c.get("incident_date") or "")[:4]
+    if not (y.isdigit() and 2000 <= int(y) <= 2026):
+        continue
+    b = by_year[int(y)]
+    b["complaints"] += 1
+    if SUBSTANTIATED(c.get("ccrb_complaint_disposition")):
+        b["substantiated"] += 1
+
+# Does footage change the finding? Only complaints from 2019 on, when body cameras were
+# citywide, and only cases the board actually adjudicated (uncooperative/withdrawn closures
+# are excluded — they say nothing about the merits).
+ADJUDICATED = {"Substantiated", "Unsubstantiated", "Exonerated", "Unfounded", "Within NYPD Guidelines"}
+def adjudicated(d):
+    d = d or ""
+    return d.startswith("Substantiated") or d in ADJUDICATED
+bwc = {"with": {"n": 0, "sub": 0}, "without": {"n": 0, "sub": 0}}
+for c in complaints:
+    y = (c.get("incident_date") or "")[:4]
+    if not (y.isdigit() and int(y) >= 2019):
+        continue
+    d = c.get("ccrb_complaint_disposition")
+    if not adjudicated(d):
+        continue
+    k = "with" if (c.get("bwc_evidence") or "") == "Yes" else "without"
+    bwc[k]["n"] += 1
+    if SUBSTANTIATED(d):
+        bwc[k]["sub"] += 1
+for k in bwc:
+    bwc[k]["pct"] = round(100 * bwc[k]["sub"] / bwc[k]["n"], 1) if bwc[k]["n"] else 0
+
+# Allegations per precinct of occurrence, last five full years, for the map.
+# Two traps here. The board leaves the precinct blank on a slice of complaints, and it has
+# never once coded a complaint to the 121st Precinct — a real precinct, carved out of the
+# 122nd on Staten Island in 2013. Mapping either as a zero would paint the emptiest
+# precincts as the cleanest, so precincts the board never codes are marked no-data instead.
+pct_alleg = Counter()
+pct_ever = Counter()
+alleg_no_precinct = 0
+recent_ids = {cid for cid, y in year_of_complaint.items() if y.isdigit() and int(y) >= 2021}
+for a in allegations:
+    c = comp_by_id.get(a.get("complaint_id"))
+    if not c:
+        continue
+    pnum = to_int(c.get("precinct_of_incident_occurrence"))
+    if not (1 <= pnum <= 123):
+        alleg_no_precinct += 1
+        continue
+    pct_ever[pnum] += 1
+    if a.get("complaint_id") in recent_ids:
+        pct_alleg[pnum] += 1
+
+# How complaints sit across today's force.
+band_counts = Counter()
+for r in rows:
+    v = by_pid.get(r[0])
+    n = v[1] if v else 0
+    band_counts["10+" if n >= 10 else "5–9" if n >= 5 else "2–4" if n >= 2 else "1" if n == 1 else "0"] += 1
+
+repeat = sorted(((v[1], v[2], pid) for pid, v in by_pid.items()), reverse=True)
+subs_total = sum(1 for a in allegations if SUBSTANTIATED(a.get("ccrb_allegation_disposition")))
+no_penalty = penalty_counts.get("No penalty", 0)
+penalty_known = sum(n for p, n in penalty_counts.items() if p != "Not yet reported")
+
+stats["ccrb"] = {
+    "as_of": (ccrb_officers[0].get("as_of_date") or "")[:10] if ccrb_officers else "",
+    "allegations": len(allegations),
+    "complaints": len(complaints),
+    "officers_in_ccrb": len(ccrb_officers),
+    "substantiated_allegations": subs_total,
+    "substantiated_pct": round(100 * subs_total / len(allegations), 1) if allegations else 0,
+    "matched_officers": matched,
+    "matched_pct": round(100 * matched / len(rows), 1) if rows else 0,
+    "roster_with_complaint": len(by_pid),
+    "roster_with_substantiated": sum(1 for v in by_pid.values() if v[2] > 0),
+    "roster_allegations": sum(v[1] for v in by_pid.values()),
+    "bands": [{"band": b, "n": band_counts.get(b, 0)} for b in ["0", "1", "2–4", "5–9", "10+"]],
+    "fado": sorted([{"type": t, "n": fado_counts[t]} for t in FADO_KEYS if fado_counts.get(t)],
+                   key=lambda x: -x["n"]),
+    "allegation_types": [{"type": t, "n": n} for t, n in allegation_counts.most_common(12)],
+    "dispositions": [{"disposition": d, "n": n} for d, n in disp_counts.most_common(12)],
+    "penalties": [{"penalty": p, "n": n} for p, n in penalty_counts.most_common(12)],
+    "penalty_records": len(penalties),
+    "no_penalty": no_penalty,
+    "no_penalty_pct": round(100 * no_penalty / penalty_known, 1) if penalty_known else 0,
+    "bwc": bwc,
+    "precincts_never_coded": [],   # filled in below, once precinct_stats is annotated
+    "by_year": [{"year": y, **by_year[y]} for y in sorted(by_year) if 2006 <= y <= 2026],
+    "max_allegations": repeat[0][0] if repeat else 0,
+    "allegations_without_precinct": alleg_no_precinct,
+}
+
+for p in precinct_stats:
+    if not pct_ever.get(p["precinct"]):
+        p["ccrb_allegations"] = None       # the board has never coded a complaint here
+        p["ccrb_per_officer"] = None
+        continue
+    p["ccrb_allegations"] = pct_alleg.get(p["precinct"], 0)
+    p["ccrb_per_officer"] = round(pct_alleg.get(p["precinct"], 0) / p["officers"], 2) if p["officers"] else 0
+
+stats["ccrb"]["precincts_never_coded"] = sorted(
+    p["precinct"] for p in precinct_stats if p["ccrb_allegations"] is None)
+
+# by_pid carries only officers who have a complaint. Everyone else is either matched with a
+# clean record or not matched at all, and the drawer must not conflate the two — so the
+# smaller of those groups (the unmatched) is listed explicitly.
+unmatched_pids = [r[0] for r in rows if r[0] not in tax_for_pid]
+dump("ccrb.json", {
+    "as_of": stats["ccrb"]["as_of"],
+    "cols": CCRB_COLS,
+    "matched": matched,
+    "roster": len(rows),
+    "by_pid": by_pid,
+    "unmatched": unmatched_pids,
+})
+
+# --------------------------------------------------------------------------
+print("9/9  Writing files…")
 dump("roster.json", {"cols": COLS, "export_date": export_date, "rows": rows})
 dump("discipline.json", disc_out)
 dump("decorated.json", {"officers": decorated, "counts": stats["honor_counts"]})
@@ -338,7 +571,7 @@ def award_row(name):
     return {"n": 0, "officers": 0}
 exc, mer = award_row("EXCELLENT POLICE DUTY"), award_row("MERITORIOUS POLICE DUTY")
 c = lambda x: f"{x:,}"
-sr, sf = stats["source_rows"], staffing
+sr, sf, cc = stats["source_rows"], staffing, stats["ccrb"]
 g_, pg_, nc_ = disp_ct.get("GUILTY", 0), disp_ct.get("PLEADED GUILTY", 0), disp_ct.get("NOLO CONTENDRE", 0)
 guilty_family = g_ + pg_ + nc_
 exc_each = round(exc["n"] / exc["officers"], 1) if exc["officers"] else 0
@@ -371,6 +604,25 @@ rest hang off it. Precinct boundaries come from a seventh (City Planning) datase
 
 Base API pattern: `https://data.cityofnewyork.us/resource/<id>.json`
 
+### The Civilian Complaint Review Board tables
+
+The NYPD's discipline file is the department judging itself, and it publishes guilty findings
+only. The CCRB is a separate agency with its own case file, published as four more datasets:
+
+| Dataset | ID | Rows | Role in this site |
+|---|---|---|---|
+| Allegations Against Police Officers | `6xgr-kwjq` | {c(cc['allegations'])} | Complaint counts per officer; the FADO and disposition charts; per-officer detail (fetched live) |
+| Police Officers | `2fir-qns4` | {c(cc['officers_in_ccrb'])} | The name-and-shield match to the NYPD roster |
+| Complaints Against Police Officers | `2mby-ccnw` | {c(cc['complaints'])} | Incident date, precinct and body-camera evidence |
+| Penalties | `keep-pkmh` | {c(cc['penalty_records'])} | What the NYPD did after the board substantiated |
+
+**The join.** The two agencies share no key: the NYPD publishes a `profile_id`, the CCRB a
+`tax_id`. Officers are matched on surname, first name and shield number, and only where that
+combination is unique on **both** sides; anything left over is matched on name alone, again only
+when unique. {c(cc['matched_officers'])} of {c(stats['officers'])} serving officers
+({cc['matched_pct']}%) match. The rest are shown as unmatched in the officer drawer rather than
+as having a clean record — an unmatched officer is not an officer without complaints.
+
 ## How the data is processed
 
 `build.py` fetches each dataset from the SODA API and writes compact JSON into `data/`:
@@ -383,7 +635,10 @@ Base API pattern: `https://data.cityofnewyork.us/resource/<id>.json`
 - **`precinct_stats.json`** — per-precinct officer count, average arrests, average
   recognitions and share with a sustained charge.
 - **`stats.json`** — all overview aggregates (rank distribution, tenure bands, award
-  tiers, top training types, headline totals).
+  tiers, top training types, headline totals, and the CCRB block).
+- **`ccrb.json`** — per-officer complaint counts for the {c(cc['roster_with_complaint'])}
+  serving officers who have one, plus the tax id the drawer needs to fetch their record live,
+  plus an explicit list of the officers who could not be matched at all.
 - **`precincts.geojson`** — precinct polygons, coordinates rounded to 4 decimal places
   (~11 m) to shrink the file for the web.
 
@@ -394,6 +649,32 @@ reflects the current published record.
 To rebuild: `python3 build.py` (standard library only, no API token required).
 
 ## Caveats — read these before citing anything
+
+### Civilian complaints
+
+- **An allegation is an account, not a finding.** {c(cc['allegations'])} allegations are on
+  file; {c(cc['substantiated_allegations'])} ({cc['substantiated_pct']}%) were substantiated by
+  the board. The largest single disposition category is not a judgment about the officer at all
+  — it is a case closed because the complainant stopped participating.
+- **Substantiated is not punished.** The board investigates; the NYPD decides the penalty and
+  reports it back. Across {c(cc['penalty_records'])} referrals, the most common single outcome
+  is **no penalty at all** — {c(cc['no_penalty'])}, or {cc['no_penalty_pct']}% of referrals with
+  a reported outcome.
+- **Only serving officers appear.** The complaint tables cover
+  {c(cc['officers_in_ccrb'])} officers, most of whom have left the force. This site shows the
+  {c(cc['roster_with_complaint'])} who are still on today's roster, so an officer who
+  accumulated complaints and then retired is absent.
+- **The body-camera comparison is not causal.** Adjudicated complaints from 2019 on were
+  substantiated {cc['bwc']['with']['pct']}% of the time with body-worn camera evidence and
+  {cc['bwc']['without']['pct']}% without. Cases that draw footage differ from cases that do not
+  — there was a recorded encounter to begin with — so this compares two kinds of case, not the
+  effect of the camera. Cases closed as withdrawn or uncooperative are excluded from both sides.
+- **The complaint map is by place, not by roster.** Allegations are counted where the incident
+  occurred. {c(cc['allegations_without_precinct'])} allegations carry no precinct and are left
+  out. The **121st Precinct** is shown as no-data, not zero: the board has never coded a single
+  complaint to it since the precinct was created on Staten Island in 2013.
+
+### The rest
 
 - **Discipline is guilty findings only.** All {c(sr['discipline_charges'])} published
   charges carry a disposition of guilty, pleaded guilty or no contest

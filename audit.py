@@ -63,6 +63,25 @@ appt_from_roster=Counter(r[ci['precinct']] for r in rows)  # placeholder not use
 yrs=[r[ci['year']] for r in rows if r[ci['year']]]
 chk("appt series sum <= officers-with-year", sum(d["n"] for d in stats["appointments_by_year"]) <= len(yrs), True)
 
+print("\n== CIVILIAN COMPLAINTS (CCRB) ==")
+ccrb=L("ccrb.json"); C=stats["ccrb"]
+ci_c={c:i for i,c in enumerate(ccrb["cols"])}
+by=ccrb["by_pid"]
+chk("officers with a complaint", len(by), C["roster_with_complaint"])
+chk("allegations across serving officers", sum(v[ci_c["allegations"]] for v in by.values()), C["roster_allegations"])
+chk("officers with a substantiated allegation",
+    sum(1 for v in by.values() if v[ci_c["substantiated"]]>0), C["roster_with_substantiated"])
+chk("matched + unmatched == roster", ccrb["matched"]+len(ccrb["unmatched"]), len(rows))
+chk("every by_pid officer is on the roster", all(pid in {r[0] for r in rows} for pid in by), True)
+chk("no officer both matched and unmatched", len(set(by)&set(ccrb["unmatched"])), 0)
+chk("band counts sum to the roster", sum(b["n"] for b in C["bands"]), len(rows))
+chk("fado sums to all allegations", sum(f["n"] for f in C["fado"]), C["allegations"])
+pmax=max(by.values(), key=lambda v:v[ci_c["allegations"]])
+live=int(api("6xgr-kwjq",{"$select":"count(*) as n","$where":f"tax_id='{pmax[ci_c['tax_id']]}'"})[0]["n"])
+chk("busiest officer's allegations match the live API", pmax[ci_c["allegations"]], live)
+never=[q["precinct"] for q in pstats if q["ccrb_allegations"] is None]
+print(f"     precincts the board never codes (shown as no-data): {never}")
+
 print("\n== PRECINCTS ==")
 geo=json.load(open(D/"precincts.geojson"))
 gp=sorted({f["properties"]["precinct"] for f in geo["features"]})

@@ -232,7 +232,7 @@
   <div class="wrap">
     <div class="kicker">New York Police Department &middot; open data</div>
     <h1>The NYPD, officer by officer</h1>
-    <p class="standfirst">The New York Police Department publishes a profile of every active uniformed officer — rank, command, lifetime arrests, medals and sustained discipline — on NYC Open Data, refreshing it every week. This is that data, made searchable.</p>
+    <p class="standfirst">The New York Police Department publishes a profile of every active uniformed officer — rank, command, lifetime arrests, medals and sustained discipline — on NYC Open Data, refreshing it every week. This is that data, made searchable, set beside the Civilian Complaint Review Board's separate file of what New Yorkers say those same officers did.</p>
     <div class="meta-line">
       <span class="snapbar"><span class="dot"></span>Point-in-time snapshot &middot; exported <b id="asof" style="color:#fff">—</b> &middot; refreshed weekly</span>
       <span>Built from the department's own <b>Officer Profile</b> datasets on NYC Open Data</span>
@@ -244,6 +244,7 @@
       <button data-tab="officers">Officer explorer</button>
       <button data-tab="arrests">Arrests</button>
       <button data-tab="discipline">Discipline</button>
+      <button data-tab="ccrb">Civilian complaints</button>
       <button data-tab="decorated">The decorated</button>
       <button data-tab="map">Precinct map</button>
       <button data-tab="method">Methodology</button>
@@ -296,11 +297,13 @@
         <option value="arr">Most arrests</option>
         <option value="rec">Most recognitions</option>
         <option value="chg">Most sustained charges</option>
+        <option value="ccrb">Most civilian complaints</option>
         <option value="ten">Longest serving</option>
         <option value="new">Newest</option>
         <option value="name">Name (A–Z)</option>
       </select>
       <label class="chk"><input type="checkbox" id="off-disc"> Only with discipline</label>
+      <label class="chk"><input type="checkbox" id="off-ccrb"> Only with a civilian complaint</label>
     </div>
     <p class="result-count" id="off-count">Loading roster…</p>
     <div class="tbl-wrap"><table id="off-table">
@@ -308,6 +311,7 @@
         <th data-k="name">Officer</th><th data-k="rank">Rank</th><th data-k="command">Command</th>
         <th class="num" data-k="year">Appointed</th><th class="num" data-k="arr">Arrests</th>
         <th class="num" data-k="rec">Awards</th><th class="num" data-k="chg">Charges</th>
+        <th class="num" data-k="ccrb">Complaints</th>
       </tr></thead><tbody id="off-body"></tbody>
     </table><div class="sentinel" id="off-sentinel"></div></div>
   </section>
@@ -346,6 +350,42 @@
     </table><div class="sentinel" id="disc-sentinel"></div></div>
   </section>
 
+  <!-- CIVILIAN COMPLAINTS (CCRB) -->
+  <section class="view" id="ccrb-view">
+    <div class="view-intro"><h2>Civilian complaints</h2><p>The discipline table on the last tab is the department judging itself, and it publishes guilty findings only. This is the other file: every allegation New Yorkers brought to the Civilian Complaint Review Board, the independent agency that investigates them, what the board concluded, and what the NYPD did about it afterward. The two systems share no common key — the CCRB records a tax number where the NYPD records a profile id — so officers here are matched by name and shield.</p></div>
+    <div class="stats" id="ccrb-stats"></div>
+    <div class="callout navy" id="ccrb-penalty" style="margin-top:16px;"></div>
+    <div class="grid2" style="margin-top:22px;">
+      <div class="panel"><h3>What people complain about</h3><p class="psub">The board sorts every allegation into one of five families, known as FADO. Abuse of authority — stops, searches, threats of arrest — is the bulk of it.</p><div id="ccrb-fado"></div></div>
+      <div class="panel"><h3>The specific allegations</h3><p class="psub">The twelve most common individual allegations across all complaints on file.</p><div id="ccrb-types"></div></div>
+    </div>
+    <div class="panel" style="margin-top:20px;"><h3>What the board concluded</h3><p class="psub">Dispositions across all allegations. The largest single category is not a finding about the officer at all — it is a case that closed because the complainant stopped participating.</p><div id="ccrb-disp"></div></div>
+    <div class="grid2" style="margin-top:20px;">
+      <div class="panel"><h3>Complaints, by year of the incident</h3><p class="psub">Recent years are incomplete: cases from the last two years are still open, and a complaint can be filed long after the incident.</p><div id="ccrb-year" class="linechart"></div></div>
+      <div class="panel"><h3>How complaints sit across the force</h3><p class="psub">Active officers by the number of allegations against them. Complaints are not spread evenly.</p><div id="ccrb-bands"></div></div>
+    </div>
+    <div class="callout" id="ccrb-bwc" style="margin-top:20px;border-color:var(--gold);background:var(--gold-bg);box-shadow:5px 5px 0 rgba(154,123,31,.1);"></div>
+    <div class="view-intro" style="margin-top:34px;"><h3 style="font-size:20px;margin:0 0 6px;">Officers on today's force, by allegations against them</h3><p style="margin:0">Only officers still on the active roster appear. Click any row for the full complaint record, pulled live from the board's file.</p></div>
+    <div class="controls">
+      <input type="search" id="ccrb-q" placeholder="Search name or command…">
+      <select id="ccrb-sort">
+        <option value="alleg">Most allegations</option>
+        <option value="sub">Most substantiated</option>
+        <option value="force">Most force allegations</option>
+        <option value="name">Name (A–Z)</option>
+      </select>
+      <label class="chk"><input type="checkbox" id="ccrb-subonly"> Only with a substantiated allegation</label>
+    </div>
+    <p class="result-count" id="ccrb-count">Loading…</p>
+    <div class="tbl-wrap"><table id="ccrb-table">
+      <thead><tr>
+        <th>Officer</th><th>Rank</th><th>Command</th>
+        <th class="num">Complaints</th><th class="num">Allegations</th>
+        <th class="num">Substantiated</th><th class="num">Force</th>
+      </tr></thead><tbody id="ccrb-body"></tbody>
+    </table><div class="sentinel" id="ccrb-sentinel"></div></div>
+  </section>
+
   <!-- DECORATED -->
   <section class="view" id="decorated-view">
     <div class="view-intro"><h2>The decorated</h2><p>The department's highest honors are vanishingly rare. These are the active officers who hold at least one of the six top medals — the valor and merit awards that sit far above the routine commendations.</p></div>
@@ -369,7 +409,9 @@
       <button data-m="officers" class="active">Officers assigned</button>
       <button data-m="avg_arrests">Avg. arrests each</button>
       <button data-m="disciplined_rate">Discipline rate</button>
+      <button data-m="ccrb_per_officer">Civilian complaints</button>
     </div>
+    <p class="psub" id="map-note" style="margin:-6px 0 14px"></p>
     <div class="map-layout">
       <div class="map-box"><svg id="pctmap" viewBox="0 0 700 640" preserveAspectRatio="xMidYMid meet"></svg></div>
       <div class="map-side">
@@ -407,9 +449,27 @@
       </table>
       <p>Precinct boundaries are the City Planning "Police Precincts" file (<code>y76i-bdw7</code>), simplified for the web.</p>
 
+      <h3>The four Civilian Complaint Review Board datasets</h3>
+      <p>The department's discipline file is the NYPD judging itself, and it publishes guilty findings only. The board is a separate agency with its own case file, published as four more datasets.</p>
+      <table class="srctable">
+        <thead><tr><th>Dataset</th><th>ID</th><th>Rows</th><th>Used for</th></tr></thead>
+        <tbody>
+          <tr><td>Allegations Against Police Officers</td><td><code>6xgr-kwjq</code></td><td data-stat="ccrb.allegations">431,639</td><td>Per-officer complaint counts; FADO and disposition charts; the drawer (live)</td></tr>
+          <tr><td>Police Officers</td><td><code>2fir-qns4</code></td><td data-stat="ccrb.officers_in_ccrb">97,553</td><td>The name-and-shield match to the NYPD roster</td></tr>
+          <tr><td>Complaints Against Police Officers</td><td><code>2mby-ccnw</code></td><td data-stat="ccrb.complaints">141,451</td><td>Incident date, precinct, body-camera evidence</td></tr>
+          <tr><td>Penalties</td><td><code>keep-pkmh</code></td><td data-stat="ccrb.penalty_records">15,153</td><td>What the NYPD did after the board substantiated</td></tr>
+        </tbody>
+      </table>
+      <p><b>How the two systems are joined.</b> They share no key — the NYPD publishes a <code>profile_id</code>, the board a <code>tax_id</code>. Officers are matched on surname, first name and shield, and only where that combination is unique on <em>both</em> sides; what is left over is matched on name alone, again only when unique. <span data-stat="ccrb.matched_officers">33,033</span> of <span data-stat="officers">34,239</span> serving officers match. The remainder are labelled unmatched in the officer drawer rather than shown as clean — an unmatched officer is not an officer without complaints.</p>
+
       <h3>What to keep in mind</h3>
       <ul>
-        <li><b>Discipline is guilty findings only.</b> All <span data-stat="total_charges">3,925</span> charges carry a guilty, pleaded-guilty or no-contest disposition. Dismissed, unsubstantiated and pending matters are absent, as are all Civilian Complaint Review Board complaints. Absence of a record here is <em>not</em> proof of a spotless history.</li>
+        <li><b>Discipline is guilty findings only.</b> All <span data-stat="total_charges">3,925</span> charges carry a guilty, pleaded-guilty or no-contest disposition. Dismissed, unsubstantiated and pending matters are absent. Absence of a record here is <em>not</em> proof of a spotless history — which is much of the point of the complaint file alongside it.</li>
+        <li><b>An allegation is an account, not a finding.</b> Of <span data-stat="ccrb.allegations">431,639</span> allegations on file, <span data-stat="ccrb.substantiated_allegations">26,508</span> were substantiated by the board. The single largest disposition is not a judgment about the officer at all: it is a case closed because the complainant stopped participating.</li>
+        <li><b>Substantiated is not punished.</b> The board investigates; the NYPD sets the penalty and reports it back. Across <span data-stat="ccrb.penalty_records">15,153</span> referrals, the most common single outcome is no penalty at all — <span data-stat="ccrb.no_penalty">3,171</span> of them.</li>
+        <li><b>The complaint tables cover officers who have left.</b> They hold <span data-stat="ccrb.officers_in_ccrb">97,553</span> officers, most no longer serving. This site shows only the <span data-stat="ccrb.roster_with_complaint">18,783</span> still on today's roster, so an officer who accumulated complaints and then retired does not appear.</li>
+        <li><b>The body-camera comparison is not causal.</b> Cases that draw footage differ from cases that do not — there was a recorded encounter to begin with — so the gap compares two kinds of case, not the effect of the camera. Cases closed as withdrawn or uncooperative are excluded from both sides of it.</li>
+        <li><b>The complaint map is by place, not by roster.</b> Allegations are counted where the incident happened. <span data-stat="ccrb.allegations_without_precinct">9,020</span> carry no precinct and are dropped, and the 121st Precinct is shown as no-data rather than zero: the board has never coded a single complaint to it since the precinct was created on Staten Island in 2013.</li>
         <li><b>It's a live snapshot of active officers.</b> Retired or separated members drop off entirely — this is not a historical roster of everyone who ever served. Medal-holders who have left the force are not counted among "the decorated."</li>
         <li><b>Arrests and recognitions are pre-totalled.</b> The department publishes lifetime cumulative counts, so they can't be sliced by year from this data alone.</li>
         <li><b>The precinct map covers patrol precincts only.</b> Officer commands were mapped to a precinct by parsing commands like <code>075 PRECINCT</code>, with the Central Park precinct (the 22nd) matched by name. About <span data-stat="staffing.precinct_patrol">13,167</span> of <span data-stat="officers">34,237</span> officers sit in a patrol precinct; the rest are in housing, transit, headquarters, the academy or specialized units and are not on the map. The boundary file contains <span data-stat="source_rows.precincts">78</span> precinct areas.</li>
@@ -482,6 +542,7 @@ function showTab(tab){
   if(tab==="officers") loadOfficers();
   if(tab==="arrests") loadArrests();
   if(tab==="discipline") loadDiscipline();
+  if(tab==="ccrb") loadCCRB();
   if(tab==="decorated") loadDecorated();
   if(tab==="map") loadMap();
 }
@@ -565,7 +626,13 @@ async function initOverview(){
     [fmt(STATS.recognitions_awarded),"Department recognitions awarded"],
     [fmt(STATS.disciplined_officers),`Officers with a sustained charge (${STATS.disciplined_pct}%)`],
     [fmt(STATS.high_honor_awards),`Top valor &amp; merit medals, held by ${fmt(STATS.decorated_officers)} officers`],
+    ...(STATS.ccrb ? [[fmt(STATS.ccrb.roster_with_complaint),`Officers with a civilian complaint on file (${Math.round(100*STATS.ccrb.roster_with_complaint/STATS.officers)}%)`]] : []),
   ].map(([n,l])=>`<div class="stat"><div class="num">${n}</div><div class="lab">${l}</div></div>`).join("");
+  if(STATS.ccrb){
+    const C=STATS.ccrb;
+    $("#ov-stats").insertAdjacentHTML("afterend",
+      `<div class="callout" style="margin-top:16px;"><b>Two discipline systems, two very different pictures.</b> The department publishes ${fmt(STATS.disciplined_officers)} serving officers with a sustained internal charge. The Civilian Complaint Review Board — a separate agency, with its own file — has ${fmt(C.roster_with_substantiated)} serving officers with at least one <em>substantiated</em> civilian allegation against them, out of ${fmt(C.roster_with_complaint)} who have been complained about at all. <a href="#" onclick="showTab('ccrb');return false;">See the complaint file →</a></div>`);
+  }
   barChart($("#ov-ranks"), STATS.ranks.slice(0,12), {label:it=>titlecase(it.rank), value:it=>it.n});
   barChart($("#ov-tenure"), STATS.tenure, {label:it=>it.band+" yrs", value:it=>it.n, cls:"green"});
   renderAwards($("#ov-awards"), STATS.awards);
@@ -628,25 +695,31 @@ async function loadOfficers(){
       `<td>${esc(titlecase(o.rank))}</td><td>${esc(titlecase(o.command))}</td>`+
       `<td class="num">${o.year||"—"}</td><td class="num">${fmt(o.arr??o.arrests)}</td>`+
       `<td class="num">${fmt(o.rec??o.recognitions)}</td>`+
-      `<td class="num">${o.chg||o.charges?('<span class="pill r">'+(o.chg??o.charges)+'</span>'):'0'}</td></tr>`);
+      `<td class="num">${o.chg||o.charges?('<span class="pill r">'+(o.chg??o.charges)+'</span>'):'0'}</td>`+
+      `<td class="num">${ccrbCell(o.profile_id)}</td></tr>`);
     $("#off-q").addEventListener("input",()=>{precinctFilter=null;filterOfficers();});
-    ["off-rank","off-sort","off-disc"].forEach(id=>$("#"+id).addEventListener("input",filterOfficers));
+    ["off-rank","off-sort","off-disc","off-ccrb"].forEach(id=>$("#"+id).addEventListener("input",filterOfficers));
+    loadCCRBData().then(()=>filterOfficers()).catch(()=>{});   // complaint counts arrive after the roster renders
     $("#off-table thead").addEventListener("click",e=>{const th=e.target.closest("th");if(!th)return;
-      const map={name:"name",rank:"rank",command:"command",year:"new",arr:"arr",rec:"rec",chg:"chg"};
+      const map={name:"name",rank:"rank",command:"command",year:"new",arr:"arr",rec:"rec",chg:"chg",ccrb:"ccrb"};
       if(map[th.dataset.k]){$("#off-sort").value=map[th.dataset.k];filterOfficers();}});
     filterOfficers();
   }catch(e){$("#off-count").innerHTML="Could not load the roster. "+e;}
 }
 function filterOfficers(){
-  const q=$("#off-q").value.trim().toLowerCase(), rank=$("#off-rank").value, sort=$("#off-sort").value, discOnly=$("#off-disc").checked;
+  const q=$("#off-q").value.trim().toLowerCase(), rank=$("#off-rank").value, sort=$("#off-sort").value,
+        discOnly=$("#off-disc").checked, ccrbOnly=$("#off-ccrb").checked;
   let list=ROSTER.filter(o=>{
     if(precinctFilter!=null && o.precinct!==precinctFilter)return false;
     if(rank&&o.rank!==rank)return false;
     if(discOnly&&!o.charges)return false;
+    if(ccrbOnly&&!(ccrbFor(o.profile_id)||{}).allegations)return false;
     if(q&&!(o.name.toLowerCase().includes(q)||(o.command||"").toLowerCase().includes(q)))return false;
     return true;
   });
+  const allegOf=o=>(ccrbFor(o.profile_id)||{}).allegations||0;
   const S={arr:(a,b)=>b.arrests-a.arrests,rec:(a,b)=>b.recognitions-a.recognitions,chg:(a,b)=>b.charges-a.charges||b.arrests-a.arrests,
+    ccrb:(a,b)=>allegOf(b)-allegOf(a)||b.arrests-a.arrests,
     ten:(a,b)=>(a.year||9999)-(b.year||9999),new:(a,b)=>(b.year||0)-(a.year||0),name:(a,b)=>a.name.localeCompare(b.name)};
   list.sort(S[sort]||S.arr);
   const chip = precinctFilter!=null ? `Precinct ${precinctFilter}${precinctFilter===22?" (Central Park)":""} · <a href="#" onclick="clearPrecinct();return false;">show all</a> · ` : "";
@@ -683,6 +756,84 @@ function filterDisc(){
   });
   $("#disc-count").innerHTML=`<b>${fmt(list.length)}</b> charge${list.length===1?"":"s"} · guilty findings only`;
   discList.set(list);
+}
+
+/* ---------- Civilian complaints (CCRB) ---------- */
+let CCRB=null, ccrbList=null;
+function ccrbFor(pid){ return CCRB && CCRB.by_pid[pid] ? Object.fromEntries(CCRB.cols.map((k,i)=>[k,CCRB.by_pid[pid][i]])) : null; }
+// Roster cell: blank until ccrb.json lands, then allegations, flagged when any were substantiated.
+function ccrbCell(pid){
+  if(!CCRB) return "";
+  const c=ccrbFor(pid);
+  if(!c||!c.allegations) return "0";
+  return c.substantiated ? `<span class="pill r" title="${c.substantiated} substantiated">${c.allegations}</span>` : String(c.allegations);
+}
+async function loadCCRBData(){
+  if(CCRB) return CCRB;
+  CCRB = await getJSON("data/ccrb.json");
+  CCRB.unmatchedSet = new Set(CCRB.unmatched||[]);
+  return CCRB;
+}
+// The complaint view needs three things: the aggregates in stats.json, the roster (for
+// names and commands) and ccrb.json. Any of the three may still be in flight.
+async function waitFor(get, what){
+  for(let i=0;i<150;i++){ const v=get(); if(v) return v; await new Promise(r=>setTimeout(r,100)); }
+  throw new Error(`${what} did not load`);
+}
+async function loadCCRB(){
+  if(loaded.ccrb) return; loaded.ccrb=true;
+  try{
+    if(!loaded.officers) loadOfficers();
+    await Promise.all([loadCCRBData(), waitFor(()=>STATS,"stats.json"), waitFor(()=>ROSTER,"the roster")]);
+    const C = STATS.ccrb;
+    $("#ccrb-stats").innerHTML=[
+      [fmt(C.allegations),`Allegations against officers, in ${fmt(C.complaints)} complaints`],
+      [`${C.substantiated_pct}%`,`Substantiated by the board (${fmt(C.substantiated_allegations)} allegations)`],
+      [fmt(C.roster_with_complaint),`Officers on today's force with a complaint (${Math.round(100*C.roster_with_complaint/STATS.officers)}%)`],
+      [fmt(C.roster_with_substantiated),"…with at least one substantiated against them"],
+      [fmt(C.max_allegations||C.max_complaints),"Most allegations against a single serving officer"],
+    ].map(([n,l])=>`<div class="stat"><div class="num">${n}</div><div class="lab">${l}</div></div>`).join("");
+
+    const p=C.penalties.find(x=>x.penalty==="No penalty");
+    $("#ccrb-penalty").innerHTML=`<b>Substantiated does not mean punished.</b> When the board substantiates a complaint, the discipline is the NYPD's to impose, and the department reports back what it did. Across <b>${fmt(C.penalty_records)}</b> of those referrals, the single most common outcome is <b>no penalty at all</b> — ${fmt(p?p.n:C.no_penalty)} of them, <b>${C.no_penalty_pct}%</b> of every referral with a reported outcome. Next most common are a command discipline, instructions from a supervisor, and formalized training. Compare that with the department's own <a href="#" onclick="showTab('discipline');return false;">sustained-discipline file</a>, which lists ${fmt(STATS.total_charges)} charges in total — every one of them a guilty finding.`;
+
+    barChart($("#ccrb-fado"), [...C.fado].sort((a,b)=>b.n-a.n), {label:it=>it.type, value:it=>it.n, cls:"red"});
+    barChart($("#ccrb-types"), C.allegation_types, {label:it=>it.type, value:it=>it.n});
+    barChart($("#ccrb-disp"), C.dispositions, {label:it=>it.disposition, value:it=>it.n});
+    lineChart($("#ccrb-year"), C.by_year.map(y=>({year:y.year,n:y.complaints})), {color:"#b23b3b"});
+    barChart($("#ccrb-bands"), C.bands, {label:it=>it.band+" allegation"+(it.band==="1"?"":"s"), value:it=>it.n, cls:"green"});
+
+    const w=C.bwc.with, wo=C.bwc.without, gap=(w.pct-wo.pct).toFixed(1);
+    $("#ccrb-bwc").innerHTML=`<b>Footage changes the finding.</b> Of the complaints from 2019 onward that the board actually adjudicated — leaving out the cases that closed because a complainant withdrew or stopped responding — those with body-worn camera evidence were substantiated <b>${w.pct}%</b> of the time (${fmt(w.sub)} of ${fmt(w.n)}). Those without it, <b>${wo.pct}%</b> (${fmt(wo.sub)} of ${fmt(wo.n)}). A ${gap}-point gap. Cases with footage are not a random sample — a complaint is likelier to draw footage when there was a recorded encounter to begin with — so this is a difference between two kinds of case, not proof that the camera caused the finding.`;
+
+    ccrbList = windowedList($("#ccrb-body"), $("#ccrb-sentinel"), o=>
+      `<tr onclick="openOfficer('${o.profile_id}')"><td class="nm">${esc(titlecase(o.name))}</td>`+
+      `<td>${esc(titlecase(o.rank))}</td><td>${esc(titlecase(o.command))}</td>`+
+      `<td class="num">${fmt(o.c.complaints)}</td><td class="num">${fmt(o.c.allegations)}</td>`+
+      `<td class="num">${o.c.substantiated?`<span class="pill r">${o.c.substantiated}</span>`:"0"}</td>`+
+      `<td class="num">${fmt(o.c.Force)}</td></tr>`);
+    ["ccrb-q","ccrb-sort","ccrb-subonly"].forEach(id=>$("#"+id).addEventListener("input",filterCCRB));
+    filterCCRB();
+  }catch(e){ $("#ccrb-count").innerHTML="Could not load the complaint file. "+e; }
+}
+function filterCCRB(){
+  if(!ROSTER||!CCRB) return;
+  const q=$("#ccrb-q").value.trim().toLowerCase(), sort=$("#ccrb-sort").value, subOnly=$("#ccrb-subonly").checked;
+  let list=[];
+  for(const o of ROSTER){
+    const c=ccrbFor(o.profile_id);
+    if(!c||!c.allegations) continue;
+    if(subOnly&&!c.substantiated) continue;
+    if(q&&!(o.name.toLowerCase().includes(q)||(o.command||"").toLowerCase().includes(q))) continue;
+    list.push({...o,c});
+  }
+  const S={alleg:(a,b)=>b.c.allegations-a.c.allegations||b.c.substantiated-a.c.substantiated,
+           sub:(a,b)=>b.c.substantiated-a.c.substantiated||b.c.allegations-a.c.allegations,
+           force:(a,b)=>b.c.Force-a.c.Force||b.c.allegations-a.c.allegations,
+           name:(a,b)=>a.name.localeCompare(b.name)};
+  list.sort(S[sort]||S.alleg);
+  $("#ccrb-count").innerHTML=`<b>${fmt(list.length)}</b> serving officer${list.length===1?"":"s"} with at least one allegation on file`;
+  ccrbList.set(list);
 }
 
 /* ---------- Decorated ---------- */
@@ -731,20 +882,26 @@ async function openOfficer(pid){
     </div>` : `<h2>Officer</h2>`;
   $("#drawer-in").innerHTML = head + `<div id="d-live"><p class="d-loading"><span class="spin"></span>Fetching full record from NYC Open Data…</p></div>`;
   try{
+    await loadCCRBData().catch(()=>{});   // the drawer needs the profile_id -> tax_id match
     let data = drawerCache[pid];
     if(!data){
       const enc=`profile_id=${encodeURIComponent(pid)}`;
-      const [titles,awards,disc] = await Promise.all([
+      // The CCRB file is keyed on tax id, not profile id — look up the match made at build time.
+      const tax = (ccrbFor(pid)||{}).tax_id;
+      const tenc = tax ? `tax_id=${encodeURIComponent(tax)}` : null;
+      const [titles,awards,disc,alleg,pen] = await Promise.all([
         getJSON(`${SODA}/sh6y-4tgb.json?${enc}&$order=effective_date desc&$limit=100`),
         getJSON(`${SODA}/i9n8-a8ed.json?${enc}&$order=date desc&$limit=500`),
         getJSON(`${SODA}/uafj-ik29.json?${enc}&$order=date desc&$limit=100`),
+        tenc ? getJSON(`${SODA}/6xgr-kwjq.json?${tenc}&$limit=600`) : Promise.resolve(null),
+        tenc ? getJSON(`${SODA}/keep-pkmh.json?${tenc}&$limit=100`) : Promise.resolve(null),
       ]);
-      data={titles,awards,disc}; drawerCache[pid]=data;
+      data={titles,awards,disc,alleg,pen}; drawerCache[pid]=data;
     }
-    renderOfficerDetail(data);
+    renderOfficerDetail(data,pid);
   }catch(e){ $("#d-live").innerHTML=`<p class="d-loading">Couldn't reach the live feed (${esc(e.message)}).</p>`; }
 }
-function renderOfficerDetail({titles,awards,disc}){
+function renderOfficerDetail({titles,awards,disc,alleg,pen},pid){
   let h="";
   if(titles.length){
     h+=`<div class="d-sec timeline"><h4>Career &amp; rank history</h4>`+titles.map(t=>
@@ -760,17 +917,44 @@ function renderOfficerDetail({titles,awards,disc}){
     h+=`<div class="d-sec"><h4 style="color:var(--red)">Sustained discipline (${disc.length})</h4>`+disc.map(d=>
       `<div class="d-item disc"><span>${esc(titlecase(d.charge_description||"—"))}<br><span class="di-pen">${esc(titlecase(d.penalty_and_quantity||d.disposition||""))}</span></span><span class="di-d">${(d.date||"").slice(0,10)}</span></div>`).join("")+`</div>`;
   } else {
-    h+=`<div class="d-sec"><h4>Sustained discipline</h4><p class="psub" style="margin:0">No sustained charge on record. This does not reflect dismissed, pending or Civilian Complaint Review Board matters.</p></div>`;
+    h+=`<div class="d-sec"><h4>Sustained discipline</h4><p class="psub" style="margin:0">No sustained departmental charge on record. Dismissed and pending matters are not published; civilian complaints are below.</p></div>`;
   }
+  h+=renderOfficerCCRB(alleg,pen,pid);
   $("#d-live").innerHTML=h;
+}
+// Civilian complaints for one officer, straight from the board's own tables.
+function renderOfficerCCRB(alleg,pen,pid){
+  const unmatched = CCRB && CCRB.unmatchedSet && CCRB.unmatchedSet.has(pid);
+  if(unmatched || !CCRB){
+    return `<div class="d-sec"><h4>Civilian complaints</h4><p class="psub" style="margin:0">${CCRB?"This officer could not be matched to a Civilian Complaint Review Board record. The two agencies publish different identifiers, and the name-and-shield match was not unique. It does not mean there are no complaints.":"The complaint file has not loaded."}</p></div>`;
+  }
+  if(!alleg||!alleg.length){
+    return `<div class="d-sec"><h4>Civilian complaints</h4><p class="psub" style="margin:0">No civilian complaint on file with the board.</p></div>`;
+  }
+  const sub=alleg.filter(a=>(a.ccrb_allegation_disposition||"").startsWith("Substantiated"));
+  const byComplaint=new Set(alleg.map(a=>a.complaint_id)).size;
+  const counts={};
+  alleg.forEach(a=>{const k=`${a.fado_type} · ${a.allegation}`;counts[k]=counts[k]||{n:0,sub:0};counts[k].n++;
+    if((a.ccrb_allegation_disposition||"").startsWith("Substantiated"))counts[k].sub++;});
+  let h=`<div class="d-sec"><h4 style="color:var(--red)">Civilian complaints (${fmt(alleg.length)} allegations in ${fmt(byComplaint)} complaints)</h4>`+
+    `<p class="psub" style="margin:0 0 10px">${sub.length?`<b>${fmt(sub.length)}</b> substantiated by the board.`:"None substantiated by the board."} An allegation is one civilian's account, not a finding.</p>`+
+    Object.entries(counts).sort((a,b)=>b[1].n-a[1].n).slice(0,14).map(([k,v])=>
+      `<div class="d-item"><span>${esc(k)}${v.sub?`<br><span class="di-pen">${v.sub} substantiated</span>`:""}</span><span class="di-d">×${v.n}</span></div>`).join("")+`</div>`;
+  if(pen&&pen.length){
+    const none=pen.filter(p=>(p.nypd_officer_penalty||"")==="No penalty").length;
+    h+=`<div class="d-sec"><h4>What the NYPD did about it</h4>`+
+      `<p class="psub" style="margin:0 0 10px">${fmt(pen.length)} substantiated case${pen.length===1?"":"s"} referred to the department${none?`, ${none} of which ended with no penalty`:""}.</p>`+
+      pen.map(p=>`<div class="d-item"><span>${esc(p.board_discipline_recommendation||"—")}<br><span class="di-pen">NYPD: ${esc(p.nypd_officer_penalty||"not yet reported")}</span></span></div>`).join("")+`</div>`;
+  }
+  return h;
 }
 function closeDrawer(){$("#drawer").classList.remove("open");$("#drawer").setAttribute("aria-hidden","true");$("#scrim").classList.remove("open");}
 document.addEventListener("keydown",e=>{if(e.key==="Escape")closeDrawer();});
 
 /* ---------- Precinct map (SVG choropleth) ---------- */
 let MAP=null, mapMetric="officers";
-const RAMPS={officers:["#dbe2ee","#1c2b46"],avg_arrests:["#d8ebe4","#1d6a54"],disciplined_rate:["#f6ded9","#8f1f1f"]};
-const METRIC_TITLE={officers:"Officers assigned",avg_arrests:"Average arrests per officer",disciplined_rate:"Share with a sustained charge"};
+const RAMPS={officers:["#dbe2ee","#1c2b46"],avg_arrests:["#d8ebe4","#1d6a54"],disciplined_rate:["#f6ded9","#8f1f1f"],ccrb_per_officer:["#f3e4d4","#8a4a12"]};
+const METRIC_TITLE={officers:"Officers assigned",avg_arrests:"Average arrests per officer",disciplined_rate:"Share with a sustained charge",ccrb_per_officer:"Civilian allegations per officer, 2021 on"};
 function lerp(a,b,t){return Math.round(a+(b-a)*t);}
 function hex2rgb(h){return [parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)];}
 function rampColor(ramp,t){const a=hex2rgb(ramp[0]),b=hex2rgb(ramp[1]);return `rgb(${lerp(a[0],b[0],t)},${lerp(a[1],b[1],t)},${lerp(a[2],b[2],t)})`;}
@@ -796,7 +980,7 @@ async function loadMap(){
       mapMetric=b.dataset.m;document.querySelectorAll("#map-metric button").forEach(x=>x.classList.toggle("active",x===b));drawMap();});
   }catch(e){$("#pctmap").outerHTML=`<p style="padding:20px;color:var(--muted)">Could not load the map (${esc(e.message)}).</p>`;}
 }
-function metricVal(s){if(!s)return null;return mapMetric==="officers"?s.officers:mapMetric==="avg_arrests"?s.avg_arrests:s.disciplined_rate;}
+function metricVal(s){if(!s)return null;return s[mapMetric]!=null?s[mapMetric]:null;}
 function drawMap(){
   const {geo,sByP,ringPath}=MAP, ramp=RAMPS[mapMetric];
   const vals=geo.features.map(f=>metricVal(sByP[f.properties.precinct])).filter(v=>v!=null).sort((a,b)=>a-b);
@@ -810,6 +994,9 @@ function drawMap(){
     return `<path d="${dd}" fill="${fill}" data-p="${p}" onmousemove="mapHover(event,${p})" onmouseleave="mapLeave()" onclick="mapClick(${p})"></path>`;
   }).join("");
   $("#map-metric-title").textContent=METRIC_TITLE[mapMetric];
+  $("#map-note").innerHTML = mapMetric==="ccrb_per_officer"
+    ? `Allegations are counted where the incident happened, not where the officer is assigned, so a precinct's figure reflects policing on its streets rather than its own roster. ${STATS&&STATS.ccrb?fmt(STATS.ccrb.allegations_without_precinct)+" allegations carry no precinct at all and are left out entirely, and the 121st Precinct is shown as no-data: the board has never once coded a complaint to it since the precinct was created in 2013.":""}`
+    : "";
   const unit=mapMetric==="disciplined_rate"?"%":"";
   $("#map-lo").textContent=fmt(lo)+unit; $("#map-hi").textContent=fmt(hi)+unit;
   $("#map-legend").innerHTML=[0,.25,.5,.75,1].map(t=>`<span style="background:${rampColor(ramp,t)}"></span>`).join("");
@@ -817,7 +1004,7 @@ function drawMap(){
 function mapHover(e,p){
   const s=MAP.sByP[p], tip=$("#maptip");
   tip.style.opacity=1; tip.style.left=(e.clientX+14)+"px"; tip.style.top=(e.clientY+14)+"px";
-  tip.innerHTML = s ? `<b>${p} Precinct</b><br>${fmt(s.officers)} officers · ${fmt(s.avg_arrests)} avg arrests<br>${fmt(s.disciplined)} with discipline (${s.disciplined_rate}%)` : `<b>${p} Precinct</b><br>no data`;
+  tip.innerHTML = s ? `<b>${p} Precinct</b><br>${fmt(s.officers)} officers · ${fmt(s.avg_arrests)} avg arrests<br>${fmt(s.disciplined)} with discipline (${s.disciplined_rate}%)<br>${fmt(s.ccrb_allegations)} civilian allegations since 2021 (${fmt(s.ccrb_per_officer)} per officer)` : `<b>${p} Precinct</b><br>no data`;
 }
 function mapLeave(){$("#maptip").style.opacity=0;}
 function mapClick(p){
@@ -827,6 +1014,7 @@ function mapClick(p){
     <div class="bar-row" style="grid-template-columns:1fr auto"><span class="bl">Avg. arrests each</span><span class="bar-val">${fmt(s.avg_arrests)}</span></div>
     <div class="bar-row" style="grid-template-columns:1fr auto"><span class="bl">Avg. awards each</span><span class="bar-val">${fmt(s.avg_recognitions)}</span></div>
     <div class="bar-row" style="grid-template-columns:1fr auto"><span class="bl">With a sustained charge</span><span class="bar-val">${fmt(s.disciplined)} (${s.disciplined_rate}%)</span></div>
+    <div class="bar-row" style="grid-template-columns:1fr auto"><span class="bl">Civilian allegations, 2021 on</span><span class="bar-val">${fmt(s.ccrb_allegations)} (${fmt(s.ccrb_per_officer)} each)</span></div>
     <button class="ai-btn" style="background:var(--navy);margin-top:12px;" onclick="viewPrecinct(${p})">View these officers →</button>` : `<h3 style="font-size:17px;">${p} Precinct</h3><p class="psub">No data.</p>`;
 }
 function viewPrecinct(p){

@@ -34,15 +34,15 @@ only. The CCRB is a separate agency with its own case file, published as four mo
 | Dataset | ID | Rows | Role in this site |
 |---|---|---|---|
 | Allegations Against Police Officers | `6xgr-kwjq` | 431,908 | Complaint counts per officer; the FADO and disposition charts; per-officer detail (fetched live) |
-| Police Officers | `2fir-qns4` | 97,553 | The name-and-shield match to the NYPD roster |
+| Police Officers | `2fir-qns4` | 98,293 | The name-and-shield match to the NYPD roster |
 | Complaints Against Police Officers | `2mby-ccnw` | 141,538 | Incident date, precinct and body-camera evidence |
 | Penalties | `keep-pkmh` | 15,153 | What the NYPD did after the board substantiated |
 
 **The join.** The two agencies share no key: the NYPD publishes a `profile_id`, the CCRB a
 `tax_id`. Officers are matched on surname, first name and shield number, and only where that
 combination is unique on **both** sides; anything left over is matched on name alone, again only
-when unique. 33,002 of 34,210 serving officers
-(96.5%) match. The rest are shown as unmatched in the officer drawer rather than
+when unique. 33,639 of 34,210 serving officers
+(98.3%) match. The rest are shown as unmatched in the officer drawer rather than
 as having a clean record — an unmatched officer is not an officer without complaints.
 
 ## How the data is processed
@@ -58,7 +58,7 @@ as having a clean record — an unmatched officer is not an officer without comp
   recognitions and share with a sustained charge.
 - **`stats.json`** — all overview aggregates (rank distribution, tenure bands, award
   tiers, top training types, headline totals, and the CCRB block).
-- **`ccrb.json`** — per-officer complaint counts for the 18,794
+- **`ccrb.json`** — per-officer complaint counts for the 18,792
   serving officers who have one, plus the tax id the drawer needs to fetch their record live,
   plus an explicit list of the officers who could not be matched at all.
 - **`precincts.geojson`** — precinct polygons, coordinates rounded to 4 decimal places
@@ -83,8 +83,8 @@ To rebuild: `python3 build.py` (standard library only, no API token required).
   is **no penalty at all** — 3,171, or 23.7% of referrals with
   a reported outcome.
 - **Only serving officers appear.** The complaint tables cover
-  97,553 officers, most of whom have left the force. This site shows the
-  18,794 who are still on today's roster, so an officer who
+  98,293 officers, most of whom have left the force. This site shows the
+  18,792 who are still on today's roster, so an officer who
   accumulated complaints and then retired is absent.
 - **The body-camera comparison is not causal.** Adjudicated complaints from 2019 on were
   substantiated 49.0% of the time with body-worn camera evidence and

@@ -35,7 +35,7 @@ only. The CCRB is a separate agency with its own case file, published as four mo
 |---|---|---|---|
 | Allegations Against Police Officers | `6xgr-kwjq` | 431,908 | Complaint counts per officer; the FADO and disposition charts; per-officer detail (fetched live) |
 | Police Officers | `2fir-qns4` | 98,293 | The name-and-shield match to the NYPD roster |
-| Complaints Against Police Officers | `2mby-ccnw` | 141,538 | Incident date, precinct and body-camera evidence |
+| Complaints Against Police Officers | `2mby-ccnw` | 141,539 | Incident date, precinct and body-camera evidence |
 | Penalties | `keep-pkmh` | 15,153 | What the NYPD did after the board substantiated |
 
 **The join.** The two agencies share no key: the NYPD publishes a `profile_id`, the CCRB a

@@ -80,7 +80,7 @@ To rebuild: `python3 build.py` (standard library only, no API token required).
   — it is a case closed because the complainant stopped participating.
 - **Substantiated is not punished.** The board investigates; the NYPD decides the penalty and
   reports it back. Across 15,314 referrals, the most common single outcome
-  is **no penalty at all** — 3,175, or 23.6% of referrals with
+  is **no penalty at all** — 3,177, or 23.6% of referrals with
   a reported outcome.
 - **Only serving officers appear.** The complaint tables cover
   98,293 officers, most of whom have left the force. This site shows the

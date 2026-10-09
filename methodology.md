@@ -33,9 +33,9 @@ only. The CCRB is a separate agency with its own case file, published as four mo
 
 | Dataset | ID | Rows | Role in this site |
 |---|---|---|---|
-| Allegations Against Police Officers | `6xgr-kwjq` | 434,124 | Complaint counts per officer; the FADO and disposition charts; per-officer detail (fetched live) |
+| Allegations Against Police Officers | `6xgr-kwjq` | 434,120 | Complaint counts per officer; the FADO and disposition charts; per-officer detail (fetched live) |
 | Police Officers | `2fir-qns4` | 98,293 | The name-and-shield match to the NYPD roster |
-| Complaints Against Police Officers | `2mby-ccnw` | 142,098 | Incident date, precinct and body-camera evidence |
+| Complaints Against Police Officers | `2mby-ccnw` | 142,097 | Incident date, precinct and body-camera evidence |
 | Penalties | `keep-pkmh` | 15,314 | What the NYPD did after the board substantiated |
 
 **The join.** The two agencies share no key: the NYPD publishes a `profile_id`, the CCRB a
@@ -74,13 +74,13 @@ To rebuild: `python3 build.py` (standard library only, no API token required).
 
 ### Civilian complaints
 
-- **An allegation is an account, not a finding.** 434,124 allegations are on
+- **An allegation is an account, not a finding.** 434,120 allegations are on
   file; 26,770 (6.2%) were substantiated by
   the board. The largest single disposition category is not a judgment about the officer at all
   — it is a case closed because the complainant stopped participating.
 - **Substantiated is not punished.** The board investigates; the NYPD decides the penalty and
   reports it back. Across 15,314 referrals, the most common single outcome
-  is **no penalty at all** — 3,177, or 23.6% of referrals with
+  is **no penalty at all** — 3,178, or 23.6% of referrals with
   a reported outcome.
 - **Only serving officers appear.** The complaint tables cover
   98,293 officers, most of whom have left the force. This site shows the

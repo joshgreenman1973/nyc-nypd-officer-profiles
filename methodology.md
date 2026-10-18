@@ -33,9 +33,9 @@ only. The CCRB is a separate agency with its own case file, published as four mo
 
 | Dataset | ID | Rows | Role in this site |
 |---|---|---|---|
-| Allegations Against Police Officers | `6xgr-kwjq` | 434,116 | Complaint counts per officer; the FADO and disposition charts; per-officer detail (fetched live) |
+| Allegations Against Police Officers | `6xgr-kwjq` | 434,236 | Complaint counts per officer; the FADO and disposition charts; per-officer detail (fetched live) |
 | Police Officers | `2fir-qns4` | 98,293 | The name-and-shield match to the NYPD roster |
-| Complaints Against Police Officers | `2mby-ccnw` | 142,096 | Incident date, precinct and body-camera evidence |
+| Complaints Against Police Officers | `2mby-ccnw` | 142,144 | Incident date, precinct and body-camera evidence |
 | Penalties | `keep-pkmh` | 15,314 | What the NYPD did after the board substantiated |
 
 **The join.** The two agencies share no key: the NYPD publishes a `profile_id`, the CCRB a
@@ -58,7 +58,7 @@ as having a clean record — an unmatched officer is not an officer without comp
   recognitions and share with a sustained charge.
 - **`stats.json`** — all overview aggregates (rank distribution, tenure bands, award
   tiers, top training types, headline totals, and the CCRB block).
-- **`ccrb.json`** — per-officer complaint counts for the 18,795
+- **`ccrb.json`** — per-officer complaint counts for the 18,805
   serving officers who have one, plus the tax id the drawer needs to fetch their record live,
   plus an explicit list of the officers who could not be matched at all.
 - **`precincts.geojson`** — precinct polygons, coordinates rounded to 4 decimal places
@@ -74,7 +74,7 @@ To rebuild: `python3 build.py` (standard library only, no API token required).
 
 ### Civilian complaints
 
-- **An allegation is an account, not a finding.** 434,116 allegations are on
+- **An allegation is an account, not a finding.** 434,236 allegations are on
   file; 26,770 (6.2%) were substantiated by
   the board. The largest single disposition category is not a judgment about the officer at all
   — it is a case closed because the complainant stopped participating.
@@ -84,7 +84,7 @@ To rebuild: `python3 build.py` (standard library only, no API token required).
   a reported outcome.
 - **Only serving officers appear.** The complaint tables cover
   98,293 officers, most of whom have left the force. This site shows the
-  18,795 who are still on today's roster, so an officer who
+  18,805 who are still on today's roster, so an officer who
   accumulated complaints and then retired is absent.
 - **The body-camera comparison is not causal.** Adjudicated complaints from 2019 on were
   substantiated 49.1% of the time with body-worn camera evidence and
@@ -92,7 +92,7 @@ To rebuild: `python3 build.py` (standard library only, no API token required).
   — there was a recorded encounter to begin with — so this compares two kinds of case, not the
   effect of the camera. Cases closed as withdrawn or uncooperative are excluded from both sides.
 - **The complaint map is by place, not by roster.** Allegations are counted where the incident
-  occurred. 9,163 allegations carry no precinct and are left
+  occurred. 9,174 allegations carry no precinct and are left
   out. The **121st Precinct** is shown as no-data, not zero: the board has never coded a single
   complaint to it since the precinct was created on Staten Island in 2013.
 

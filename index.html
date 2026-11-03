@@ -259,7 +259,7 @@
   <!-- OVERVIEW -->
   <section class="view active" id="overview-view">
     <div class="callout navy" style="margin-top:0;margin-bottom:16px;">
-      <b>What time is this data for?</b> It's a <b>point-in-time snapshot the NYPD exported on <span id="snap-date">—</span></b>, and the department refreshes it every week. Every arrest and recognition figure is a <b>cumulative career total as of that date</b> — not a count for any single year. The force changes constantly as officers are hired and retire, so this is today's roster, not a historical record. The one place you can see genuine change over time is <a href="#" onclick="document.getElementById('trends').scrollIntoView({behavior:'smooth'});return false;">What changes over time</a>, below.
+      <b>What time is this data for?</b> It's a <b>point-in-time snapshot the NYPD exported on <span id="snap-date">—</span></b>, and the department refreshes it every week. Every arrest and recognition figure is a <b>cumulative career total as of that date</b>. The force changes constantly as officers are hired and retire, so this is today's roster, not a historical record. The one place you can see change over time is <a href="#" onclick="document.getElementById('trends').scrollIntoView({behavior:'smooth'});return false;">What changes over time</a>, below.
     </div>
     <div class="callout" id="ov-headcount" style="margin-top:0;margin-bottom:16px;border-color:var(--gold);background:var(--gold-bg);box-shadow:5px 5px 0 rgba(154,123,31,.1);"></div>
     <div class="stats" id="ov-stats"></div>
@@ -270,22 +270,22 @@
     </div>
     <div class="grid2">
       <div class="panel"><h3>Department recognitions</h3><p class="psub">How many times each award is given, and how many officers hold at least one. The routine honors are awarded to the same officers over and over.</p><div id="ov-awards"></div></div>
-      <div class="panel"><h3>The training machine</h3><p class="psub">Most-logged training types across 12.7 million records</p><div id="ov-training"></div></div>
+      <div class="panel"><h3>Training</h3><p class="psub">Most-logged training types across 12.7 million records</p><div id="ov-training"></div></div>
     </div>
 
     <div id="trends" style="margin-top:34px;padding-top:8px;border-top:2px solid var(--ink);">
       <div class="view-intro" style="margin:16px 0 4px;">
         <h2 style="font-size:24px;">What changes over time</h2>
-        <p>Most of this data is a still photograph — arrest and award counts are lifetime totals with no yearly breakdown. But three date fields let us trace real change. <b>Read the last year or two with care:</b> they're incomplete, for the reasons noted under each chart. Hover any chart for the yearly figure.</p>
+        <p>Most of this data is a still photograph — arrest and award counts are lifetime totals with no yearly breakdown. But three date fields let us trace change over time. <b>Read the last year or two with care:</b> they're incomplete, for the reasons noted under each chart. Hover any chart for the yearly figure.</p>
       </div>
       <div class="grid2">
         <div class="panel"><h3>Today's force, by hiring year</h3><p class="psub">Active officers by the year they were appointed. Earlier years are thinned by retirement, so this is the <em>surviving</em> cohort, not the size of each original class. The 2026 bar is a partial year.</p><div id="ov-appt" class="linechart"></div></div>
-        <div class="panel"><h3>Sustained charges, by year decided</h3><p class="psub">Guilty disciplinary findings by the year they were decided. The most recent years lag sharply because cases are still moving through the process — not because misconduct stopped.</p><div id="ov-charges" class="linechart"></div></div>
+        <div class="panel"><h3>Sustained charges, by year decided</h3><p class="psub">Guilty disciplinary findings by the year they were decided. The most recent years lag sharply because cases are still moving through the process.</p><div id="ov-charges" class="linechart"></div></div>
       </div>
       <div class="panel" style="margin-top:20px;"><h3>Top medals awarded, by year</h3><p class="psub">The six highest valor and merit honors, held by officers on today's force, by the year the medal was awarded. Only medals belonging to still-active officers appear, so earlier years understate the totals.</p><div id="ov-honors" class="linechart"></div></div>
     </div>
     <div class="callout">
-      <b>The single most important caveat.</b> The disciplinary data published here contains <b>only charges that ended in a guilty finding</b> — every one of the <span data-stat="total_charges">3,925</span> charges has a disposition of guilty, pleaded guilty or no contest. Allegations that were dismissed, unsubstantiated or are still pending do <b>not</b> appear, and civilian complaints to the Civilian Complaint Review Board live in a separate system entirely. An officer with no record here has no <em>sustained departmental charge</em> — which is not the same as a clean complaint history.
+      <b>Read this first.</b> The disciplinary data published here contains <b>only charges that ended in a guilty finding</b> — every one of the <span data-stat="total_charges">3,925</span> charges has a disposition of guilty, pleaded guilty or no contest. Allegations that were dismissed, unsubstantiated or are still pending do <b>not</b> appear, and civilian complaints to the Civilian Complaint Review Board live in a separate system entirely. An officer with no record here has no <em>sustained departmental charge</em> — which is not the same as a clean complaint history.
     </div>
   </section>
 
@@ -325,7 +325,7 @@
     <div class="callout navy" id="arr-conc" style="margin-top:16px;"></div>
     <div class="panel" style="margin-top:22px;"><h3>Officers by lifetime arrest count</h3><p class="psub">How many officers fall in each arrest range. The shape leans left — most officers make modest numbers, a few make thousands.</p><div id="arr-hist"></div></div>
     <div class="grid2">
-      <div class="panel"><h3>Arrests by rank</h3><p class="psub">Detective grades dominate career totals. Switch to "per year of service" to strip out the fact that senior officers have simply had more years.</p>
+      <div class="panel"><h3>Arrests by rank</h3><p class="psub">Detective grades dominate career totals. Switch to "per year of service" to adjust for senior officers' extra years of service.</p>
         <div class="metric-toggle" id="arr-rank-toggle" style="margin-bottom:14px;"><button data-m="avg" class="active">Average career total</button><button data-m="per_year">Per year of service</button></div>
         <div id="arr-rank"></div></div>
       <div class="panel"><h3>Arrests by time served</h3><p class="psub">Career totals climb with tenure — mostly accumulation. The per-year rate shows officers are most active early, then ease off as they rise into supervisory roles.</p>
@@ -338,7 +338,7 @@
   <!-- DISCIPLINE -->
   <section class="view" id="discipline-view">
     <div class="view-intro"><h2>Sustained discipline</h2><p>Every one of the <span data-stat="total_charges">3,925</span> disciplinary charges the department has published — all of which ended in a guilty finding. Each row is a single charge; one incident can produce several.</p></div>
-    <div class="callout" style="margin-top:0;margin-bottom:18px;">Guilty findings only. Dismissed, unproven and pending matters are not in this dataset, and neither are Civilian Complaint Review Board complaints. Read this as the record of <b>proven, adjudicated</b> departmental discipline, not the universe of allegations.</div>
+    <div class="callout" style="margin-top:0;margin-bottom:18px;">Guilty findings only. Dismissed, unproven and pending matters are not in this dataset, and neither are Civilian Complaint Review Board complaints. Read this as the record of <b>proven, adjudicated</b> departmental discipline.</div>
     <div class="controls">
       <input type="search" id="disc-q" placeholder="Search name, charge or command…">
       <select id="disc-disp"><option value="">All dispositions</option></select>
@@ -354,14 +354,14 @@
 
   <!-- CIVILIAN COMPLAINTS (CCRB) -->
   <section class="view" id="ccrb-view">
-    <div class="view-intro"><h2>Civilian complaints</h2><p>The discipline table on the last tab is the department judging itself, and it publishes guilty findings only. This is the other file: every allegation New Yorkers brought to the Civilian Complaint Review Board, the independent agency that investigates them, what the board concluded, and what the NYPD did about it afterward. The two systems share no common key — the CCRB records a tax number where the NYPD records a profile id — so officers here are matched by name and shield.</p></div>
+    <div class="view-intro"><h2>Civilian complaints</h2><p>The discipline table on the last tab is the department's own record, and it publishes guilty findings only. This is the other file: every allegation New Yorkers brought to the Civilian Complaint Review Board, the independent agency that investigates them, what the board concluded, and what the NYPD did about it afterward. The two systems share no common key — the board records a tax number where the NYPD records a profile id — so officers here are matched by name and shield.</p></div>
     <div class="stats" id="ccrb-stats"></div>
     <div class="callout navy" id="ccrb-penalty" style="margin-top:16px;"></div>
     <div class="grid2" style="margin-top:22px;">
-      <div class="panel"><h3>What people complain about</h3><p class="psub">The board sorts every allegation into one of five families, known as FADO. Abuse of authority — stops, searches, threats of arrest — is the bulk of it.</p><div id="ccrb-fado"></div></div>
+      <div class="panel"><h3>What people complain about</h3><p class="psub">The board sorts every allegation into one of five families, known as FADO for the first four: force, abuse of authority, discourtesy and offensive language. The fifth is untruthful statement. Abuse of authority — stops, searches, threats of arrest — is the bulk of it.</p><div id="ccrb-fado"></div></div>
       <div class="panel"><h3>The specific allegations</h3><p class="psub">The twelve most common individual allegations across all complaints on file.</p><div id="ccrb-types"></div></div>
     </div>
-    <div class="panel" style="margin-top:20px;"><h3>What the board concluded</h3><p class="psub">Dispositions across all allegations. The largest single category is not a finding about the officer at all — it is a case that closed because the complainant stopped participating.</p><div id="ccrb-disp"></div></div>
+    <div class="panel" style="margin-top:20px;"><h3>What the board concluded</h3><p class="psub">Dispositions across all allegations. The largest category is cases that closed because the complainant stopped participating.</p><div id="ccrb-disp"></div></div>
     <div class="grid2" style="margin-top:20px;">
       <div class="panel"><h3>Complaints, by year of the incident</h3><p class="psub">Recent years are incomplete: cases from the last two years are still open, and a complaint can be filed long after the incident.</p><div id="ccrb-year" class="linechart"></div></div>
       <div class="panel"><h3>How complaints sit across the force</h3><p class="psub">Active officers by the number of allegations against them. Complaints are not spread evenly.</p><div id="ccrb-bands"></div></div>
@@ -434,7 +434,7 @@
   <section class="view" id="method-view">
     <div class="prose">
       <h2 style="font-size:28px;margin:0 0 6px;">Methodology &amp; caveats</h2>
-      <p>Nothing here is a black box. Every figure comes from datasets the New York Police Department publishes on NYC Open Data and refreshes weekly. The site loads them directly; per-officer detail is fetched live from the same servers when you open an officer.</p>
+      <p>Every figure comes from datasets the New York Police Department publishes on NYC Open Data and refreshes weekly. The site loads them directly; per-officer detail is fetched live from the same servers when you open an officer.</p>
 
       <h3>The six source datasets</h3>
       <p>All six share a single key, <code>profile_id</code>. The roster is the hub; the others hang off it.</p>
@@ -452,7 +452,7 @@
       <p>Precinct boundaries are the City Planning "Police Precincts" file (<code>y76i-bdw7</code>), simplified for the web.</p>
 
       <h3>The four Civilian Complaint Review Board datasets</h3>
-      <p>The department's discipline file is the NYPD judging itself, and it publishes guilty findings only. The board is a separate agency with its own case file, published as four more datasets.</p>
+      <p>The department's discipline file is the NYPD's own record, and it publishes guilty findings only. The board is a separate agency with its own case file, published as four more datasets.</p>
       <table class="srctable">
         <thead><tr><th>Dataset</th><th>ID</th><th>Rows</th><th>Used for</th></tr></thead>
         <tbody>
@@ -466,13 +466,13 @@
 
       <h3>What to keep in mind</h3>
       <ul>
-        <li><b>Discipline is guilty findings only.</b> All <span data-stat="total_charges">3,925</span> charges carry a guilty, pleaded-guilty or no-contest disposition. Dismissed, unsubstantiated and pending matters are absent. Absence of a record here is <em>not</em> proof of a spotless history — which is much of the point of the complaint file alongside it.</li>
-        <li><b>An allegation is an account, not a finding.</b> Of <span data-stat="ccrb.allegations">431,639</span> allegations on file, <span data-stat="ccrb.substantiated_allegations">26,508</span> were substantiated by the board. The single largest disposition is not a judgment about the officer at all: it is a case closed because the complainant stopped participating.</li>
-        <li><b>Substantiated is not punished.</b> The board investigates; the NYPD sets the penalty and reports it back. Across <span data-stat="ccrb.penalty_records">15,153</span> referrals, the most common single outcome is no penalty at all — <span data-stat="ccrb.no_penalty">3,171</span> of them.</li>
+        <li><b>Discipline is guilty findings only.</b> All <span data-stat="total_charges">3,925</span> charges carry a guilty, pleaded-guilty or no-contest disposition. Dismissed, unsubstantiated and pending matters are absent. Absence of a record here is <em>not</em> proof of a spotless history, which is why the complaint file sits alongside it.</li>
+        <li><b>Most allegations are not substantiated.</b> Of <span data-stat="ccrb.allegations">431,639</span> allegations on file, <span data-stat="ccrb.substantiated_allegations">26,508</span> were substantiated by the board. The largest disposition is a case closed because the complainant stopped participating.</li>
+        <li><b>A substantiated allegation may bring no penalty.</b> The board investigates; the NYPD sets the penalty and reports it back. Across <span data-stat="ccrb.penalty_records">15,153</span> referrals, the most common outcome is no penalty at all — <span data-stat="ccrb.no_penalty">3,171</span> of them.</li>
         <li><b>The complaint tables cover officers who have left.</b> They hold <span data-stat="ccrb.officers_in_ccrb">97,553</span> officers, most no longer serving. This site shows only the <span data-stat="ccrb.roster_with_complaint">18,783</span> still on today's roster, so an officer who accumulated complaints and then retired does not appear.</li>
         <li><b>The body-camera comparison is not causal.</b> Cases that draw footage differ from cases that do not — there was a recorded encounter to begin with — so the gap compares two kinds of case, not the effect of the camera. Cases closed as withdrawn or uncooperative are excluded from both sides of it.</li>
-        <li><b>The complaint map is by place, not by roster.</b> Allegations are counted where the incident happened. <span data-stat="ccrb.allegations_without_precinct">9,020</span> carry no precinct and are dropped, and the 121st Precinct is shown as no-data rather than zero: the board has never coded a single complaint to it since the precinct was created on Staten Island in 2013.</li>
-        <li><b>It's a live snapshot of active officers.</b> Retired or separated members drop off entirely — this is not a historical roster of everyone who ever served. Medal-holders who have left the force are not counted among "the decorated."</li>
+        <li><b>The complaint map is by place.</b> Allegations are counted where the incident happened. <span data-stat="ccrb.allegations_without_precinct">9,020</span> carry no precinct and are dropped, and the 121st Precinct is shown as no-data rather than zero: the board has never coded a single complaint to it since the precinct was created on Staten Island in 2013.</li>
+        <li><b>It's a live snapshot of active officers.</b> Retired or separated members drop off entirely. Medal-holders who have left the force are not counted among "the decorated."</li>
         <li><b>Arrests and recognitions are pre-totalled.</b> The department publishes lifetime cumulative counts, so they can't be sliced by year from this data alone.</li>
         <li><b>The precinct map covers patrol precincts only.</b> Officer commands were mapped to a precinct by parsing commands like <code>075 PRECINCT</code>, with the Central Park precinct (the 22nd) matched by name. About <span data-stat="staffing.precinct_patrol">13,167</span> of <span data-stat="officers">34,237</span> officers sit in a patrol precinct; the rest are in housing, transit, headquarters, the academy or specialized units and are not on the map. The boundary file contains <span data-stat="source_rows.precincts">78</span> precinct areas.</li>
         <li><b>Awards given vs officers who hold them.</b> The same officer can receive an award many times, so the count of awards is far larger than the number of recipients — Excellent Police Duty is given <span id="m-exc-n">91,330</span> times but to <span id="m-exc-off">16,468</span> officers (about <span id="m-exc-each">5.5</span> each). The awards table shows both figures side by side. The medals, by contrast, are almost one-per-officer.</li>
@@ -484,16 +484,16 @@
       <h3>Reading the headcount</h3>
       <p>Total NYPD strength is a perennial fight at City Council budget hearings, and the raw <span data-stat="officers">34,237</span> needs context before it is cited.</p>
       <ul>
-        <li><b>Recruits are in the count.</b> <span data-stat="staffing.recruits">2,194</span> officers are in the "RTS RECRUITS" command — recruits in the Police Academy, and the single largest command on the force — plus about <span data-stat="staffing.academy">126</span> in the Police Academy itself. They are counted as active members but are not deployed.</li>
+        <li><b>Recruits are in the count.</b> <span data-stat="staffing.recruits">2,194</span> officers are in the "RTS RECRUITS" command — recruits in the Police Academy, and the largest command on the force — plus about <span data-stat="staffing.academy">126</span> in the Police Academy itself. They are counted as active members but are not deployed.</li>
         <li><b>So are officers who aren't working.</b> <span data-stat="staffing.military_leave">776</span> sit at the "Military &amp; Extended Leave Desk" — on military deployment or extended leave. Setting recruits and this group aside, the number available for duty is nearer <span data-stat="staffing.available_est">31,300</span> than <span data-stat="officers">34,200</span>.</li>
         <li><b>Domestic-violence officers moved out of patrol.</b> About <span data-stat="staffing.dv_officers">504</span> officers work in domestic-violence assignments, <span data-stat="staffing.dv_precinct_squads">455</span> of them in precinct-based "domestic violence squads" that are organizationally separate from the precinct patrol roster. They carry a precinct number but are counted apart from patrol strength — the work stayed local even as the officers were reorganized.</li>
-        <li><b>Patrol strength is not the same as a precinct's footprint.</b> The precinct map counts patrol and field-training commands (<span data-stat="staffing.precinct_patrol">13,167</span> officers). A further ~<span data-stat="staffing.precinct_squads_extra">1,477</span> officers work in precinct-based detective and domestic-violence squads that fall outside that patrol count, so the map understates how many officers a precinct actually fields.</li>
+        <li><b>Patrol strength undercounts a precinct's footprint.</b> The precinct map counts patrol and field-training commands (<span data-stat="staffing.precinct_patrol">13,167</span> officers). A further ~<span data-stat="staffing.precinct_squads_extra">1,477</span> officers work in precinct-based detective and domestic-violence squads that fall outside that patrol count, so the map understates how many officers a precinct fields.</li>
       </ul>
 
       <h3>What time the data is for, and the trends</h3>
       <ul>
-        <li><b>This is a weekly point-in-time snapshot,</b> exported by the department on the date shown at the top of the page. Arrest and recognition figures are lifetime cumulative totals as of that date, with no annual breakdown — they are not counts for any single year.</li>
-        <li>The three "What changes over time" charts are the only genuine time series here, each built from a real date field: officer <code>appointment_date</code>, disciplinary charge <code>date</code> and award <code>date</code>.</li>
+        <li><b>This is a weekly point-in-time snapshot,</b> exported by the department on the date shown at the top of the page. Arrest and recognition figures are lifetime cumulative totals as of that date, with no annual breakdown.</li>
+        <li>The three "What changes over time" charts are the only time series here, each built from a date field: officer <code>appointment_date</code>, disciplinary charge <code>date</code> and award <code>date</code>.</li>
         <li><b>Hiring by year is survivorship-biased.</b> Because only active officers are in the data, earlier years show the surviving cohort, not the original class size — an officer hired in 1995 who has since retired isn't counted. The most recent year is partial.</li>
         <li><b>Sustained charges by year lag at the recent end</b> because cases take time to be adjudicated and published; a low recent count reflects the process, not a drop in conduct issues.</li>
         <li><b>Medals by year understate earlier years,</b> since only honors held by still-active officers appear.</li>
@@ -508,7 +508,7 @@
         <p>The data pipeline and this interface were built by an AI assistant working from the public datasets named above. Checks performed:</p>
         <ul>
           <li>Every headline number is computed directly from the source data at build time — nothing is hand-entered or estimated.</li>
-          <li>Row counts and the guilty-only nature of the discipline data were verified against the live SODA API.</li>
+          <li>Row counts and the guilty-only nature of the discipline data were verified against the live Socrata Open Data API (SODA).</li>
           <li>Per-officer detail is fetched from the city's own endpoints at view time, so it reflects the current published record.</li>
         </ul>
         <p style="margin-top:10px;">Not independently verified: the accuracy of the department's underlying records, the completeness of the precinct-command parsing, and any changes the NYPD makes after the snapshot date. Treat this as a research and reporting aid, and confirm any specific claim against the <a href="https://data.cityofnewyork.us/browse?q=officer%20profile" target="_blank" rel="noopener">original datasets</a> before publishing.</p>
@@ -621,7 +621,7 @@ async function initOverview(){
   $("#asof").textContent = STATS.export_date; $("#asof2").textContent = STATS.export_date; $("#snap-date").textContent = STATS.export_date;
   fillStaticNumbers(STATS);
   const st = STATS.staffing;
-  if(st) $("#ov-headcount").innerHTML = `<b>Before you cite "${fmt(st.total)} officers."</b> Police headcount is a running fight at City Council budget hearings, and the raw number carries footnotes the department rarely volunteers. <b>${fmt(st.recruits)}</b> of these officers are recruits still in the Police Academy — the "RTS RECRUITS" command is the single largest command on the entire force — and are not yet deployed. Another <b>${fmt(st.military_leave)}</b> sit at the Military &amp; Extended Leave Desk, on deployment or extended leave. Set those aside and the number available for duty is nearer <b>${fmt(st.available_est)}</b> than ${fmt(st.total)}. Separately, about <b>${fmt(st.dv_officers)}</b> domestic-violence officers now work in their own precinct squads, organizationally split from patrol — so precinct patrol counts understate who actually handles a precinct's cases. <a href="#" onclick="showTab('method');return false;">More in the methodology.</a>`;
+  if(st) $("#ov-headcount").innerHTML = `<b>Before you cite "${fmt(st.total)} officers."</b> Police headcount is a running fight at City Council budget hearings, and the raw number carries footnotes the department rarely volunteers. <b>${fmt(st.recruits)}</b> of these officers are recruits still in the Police Academy — the "RTS RECRUITS" command is the largest command on the force — and are not yet deployed. Another <b>${fmt(st.military_leave)}</b> sit at the Military &amp; Extended Leave Desk, on deployment or extended leave. Set those aside and the number available for duty is nearer <b>${fmt(st.available_est)}</b> than ${fmt(st.total)}. Separately, about <b>${fmt(st.dv_officers)}</b> domestic-violence officers now work in their own precinct squads, organizationally split from patrol — so precinct patrol counts understate who handles a precinct's cases. <a href="#" onclick="showTab('method');return false;">More in the methodology.</a>`;
   $("#ov-stats").innerHTML = [
     [fmt(STATS.officers),"Active uniformed officers"],
     [fmt(STATS.total_arrests),"Lifetime arrests, all officers"],
@@ -633,7 +633,7 @@ async function initOverview(){
   if(STATS.ccrb){
     const C=STATS.ccrb;
     $("#ov-stats").insertAdjacentHTML("afterend",
-      `<div class="callout" style="margin-top:16px;"><b>Two discipline systems, two very different pictures.</b> The department publishes ${fmt(STATS.disciplined_officers)} serving officers with a sustained internal charge. The Civilian Complaint Review Board — a separate agency, with its own file — has ${fmt(C.roster_with_substantiated)} serving officers with at least one <em>substantiated</em> civilian allegation against them, out of ${fmt(C.roster_with_complaint)} who have been complained about at all. <a href="#" onclick="showTab('ccrb');return false;">See the complaint file →</a></div>`);
+      `<div class="callout" style="margin-top:16px;"><b>The two discipline files compared.</b> The department publishes ${fmt(STATS.disciplined_officers)} serving officers with a sustained internal charge. The Civilian Complaint Review Board — a separate agency, with its own file — has ${fmt(C.roster_with_substantiated)} serving officers with at least one <em>substantiated</em> civilian allegation against them, out of ${fmt(C.roster_with_complaint)} who have been complained about at all. <a href="#" onclick="showTab('ccrb');return false;">See the complaint file →</a></div>`);
   }
   barChart($("#ov-ranks"), STATS.ranks.slice(0,12), {label:it=>titlecase(it.rank), value:it=>it.n});
   barChart($("#ov-tenure"), STATS.tenure, {label:it=>it.band+" yrs", value:it=>it.n, cls:"green"});
@@ -797,7 +797,7 @@ async function loadCCRB(){
     ].map(([n,l])=>`<div class="stat"><div class="num">${n}</div><div class="lab">${l}</div></div>`).join("");
 
     const p=C.penalties.find(x=>x.penalty==="No penalty");
-    $("#ccrb-penalty").innerHTML=`<b>Substantiated does not mean punished.</b> When the board substantiates a complaint, the discipline is the NYPD's to impose, and the department reports back what it did. Across <b>${fmt(C.penalty_records)}</b> of those referrals, the single most common outcome is <b>no penalty at all</b> — ${fmt(p?p.n:C.no_penalty)} of them, <b>${C.no_penalty_pct}%</b> of every referral with a reported outcome. Next most common are a command discipline, instructions from a supervisor, and formalized training. Compare that with the department's own <a href="#" onclick="showTab('discipline');return false;">sustained-discipline file</a>, which lists ${fmt(STATS.total_charges)} charges in total — every one of them a guilty finding.`;
+    $("#ccrb-penalty").innerHTML=`<b>Substantiated does not mean punished.</b> When the board substantiates a complaint, the discipline is the NYPD's to impose, and the department reports back what it did. Across <b>${fmt(C.penalty_records)}</b> of those referrals, the most common outcome is <b>no penalty at all</b> — ${fmt(p?p.n:C.no_penalty)} of them, <b>${C.no_penalty_pct}%</b> of every referral with a reported outcome. Next most common are a command discipline, instructions from a supervisor, and formalized training. Compare that with the department's own <a href="#" onclick="showTab('discipline');return false;">sustained-discipline file</a>, which lists ${fmt(STATS.total_charges)} charges in total, all of them guilty findings.`;
 
     barChart($("#ccrb-fado"), [...C.fado].sort((a,b)=>b.n-a.n), {label:it=>it.type, value:it=>it.n, cls:"red"});
     barChart($("#ccrb-types"), C.allegation_types, {label:it=>it.type, value:it=>it.n});
@@ -806,7 +806,7 @@ async function loadCCRB(){
     barChart($("#ccrb-bands"), C.bands, {label:it=>it.band+" allegation"+(it.band==="1"?"":"s"), value:it=>it.n, cls:"green"});
 
     const w=C.bwc.with, wo=C.bwc.without, gap=(w.pct-wo.pct).toFixed(1);
-    $("#ccrb-bwc").innerHTML=`<b>Footage changes the finding.</b> Of the complaints from 2019 onward that the board actually adjudicated — leaving out the cases that closed because a complainant withdrew or stopped responding — those with body-worn camera evidence were substantiated <b>${w.pct}%</b> of the time (${fmt(w.sub)} of ${fmt(w.n)}). Those without it, <b>${wo.pct}%</b> (${fmt(wo.sub)} of ${fmt(wo.n)}). A ${gap}-point gap. Cases with footage are not a random sample — a complaint is likelier to draw footage when there was a recorded encounter to begin with — so this is a difference between two kinds of case, not proof that the camera caused the finding.`;
+    $("#ccrb-bwc").innerHTML=`<b>Complaints with footage are substantiated more often.</b> Of the complaints from 2019 onward that the board adjudicated — leaving out the cases that closed because a complainant withdrew or stopped responding — those with body-worn camera evidence were substantiated <b>${w.pct}%</b> of the time (${fmt(w.sub)} of ${fmt(w.n)}). Those without it, <b>${wo.pct}%</b> (${fmt(wo.sub)} of ${fmt(wo.n)}), a ${gap}-point gap. Cases with footage are not a random sample — a complaint is likelier to draw footage when there was a recorded encounter to begin with — so this is a difference between two kinds of case, not proof that the camera caused the finding.`;
 
     ccrbList = windowedList($("#ccrb-body"), $("#ccrb-sentinel"), o=>
       `<tr onclick="openOfficer('${o.profile_id}')"><td class="nm">${esc(titlecase(o.name))}</td>`+
@@ -997,7 +997,7 @@ function drawMap(){
   }).join("");
   $("#map-metric-title").textContent=METRIC_TITLE[mapMetric];
   $("#map-note").innerHTML = mapMetric==="ccrb_per_officer"
-    ? `Allegations are counted where the incident happened, not where the officer is assigned, so a precinct's figure reflects policing on its streets rather than its own roster. ${STATS&&STATS.ccrb?fmt(STATS.ccrb.allegations_without_precinct)+" allegations carry no precinct at all and are left out entirely, and the 121st Precinct is shown as no-data: the board has never once coded a complaint to it since the precinct was created in 2013.":""}`
+    ? `Allegations are counted where the incident happened, not where the officer is assigned, so a precinct's figure reflects policing on its streets rather than its own roster. ${STATS&&STATS.ccrb?fmt(STATS.ccrb.allegations_without_precinct)+" allegations carry no precinct and are left out, and the 121st Precinct is shown as no-data: the board has never coded a complaint to it since the precinct was created in 2013.":""}`
     : "";
   const unit=mapMetric==="disciplined_rate"?"%":"";
   $("#map-lo").textContent=fmt(lo)+unit; $("#map-hi").textContent=fmt(hi)+unit;

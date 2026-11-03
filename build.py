@@ -606,7 +606,7 @@ Base API pattern: `https://data.cityofnewyork.us/resource/<id>.json`
 
 ### The Civilian Complaint Review Board tables
 
-The NYPD's discipline file is the department judging itself, and it publishes guilty findings
+The NYPD's discipline file is the department's own record, and it publishes guilty findings
 only. The CCRB is a separate agency with its own case file, published as four more datasets:
 
 | Dataset | ID | Rows | Role in this site |
@@ -625,7 +625,7 @@ as having a clean record — an unmatched officer is not an officer without comp
 
 ## How the data is processed
 
-`build.py` fetches each dataset from the SODA API and writes compact JSON into `data/`:
+`build.py` fetches each dataset from the Socrata Open Data API (SODA) and writes compact JSON into `data/`:
 
 - **`roster.json`** — all {c(sr['roster'])} officers as a compact columnar array. A
   per-officer count of sustained charges and a parsed precinct number are added.
@@ -635,7 +635,7 @@ as having a clean record — an unmatched officer is not an officer without comp
 - **`precinct_stats.json`** — per-precinct officer count, average arrests, average
   recognitions and share with a sustained charge.
 - **`stats.json`** — all overview aggregates (rank distribution, tenure bands, award
-  tiers, top training types, headline totals, and the CCRB block).
+  tiers, top training types, headline totals and the CCRB block).
 - **`ccrb.json`** — per-officer complaint counts for the {c(cc['roster_with_complaint'])}
   serving officers who have one, plus the tax id the drawer needs to fetch their record live,
   plus an explicit list of the officers who could not be matched at all.
@@ -652,12 +652,12 @@ To rebuild: `python3 build.py` (standard library only, no API token required).
 
 ### Civilian complaints
 
-- **An allegation is an account, not a finding.** {c(cc['allegations'])} allegations are on
+- **Most allegations are not substantiated.** {c(cc['allegations'])} allegations are on
   file; {c(cc['substantiated_allegations'])} ({cc['substantiated_pct']}%) were substantiated by
-  the board. The largest single disposition category is not a judgment about the officer at all
-  — it is a case closed because the complainant stopped participating.
-- **Substantiated is not punished.** The board investigates; the NYPD decides the penalty and
-  reports it back. Across {c(cc['penalty_records'])} referrals, the most common single outcome
+  the board. The largest disposition category is cases closed because the complainant
+  stopped participating.
+- **A substantiated allegation may bring no penalty.** The board investigates; the NYPD decides the penalty and
+  reports it back. Across {c(cc['penalty_records'])} referrals, the most common outcome
   is **no penalty at all** — {c(cc['no_penalty'])}, or {cc['no_penalty_pct']}% of referrals with
   a reported outcome.
 - **Only serving officers appear.** The complaint tables cover
@@ -669,7 +669,7 @@ To rebuild: `python3 build.py` (standard library only, no API token required).
   {cc['bwc']['without']['pct']}% without. Cases that draw footage differ from cases that do not
   — there was a recorded encounter to begin with — so this compares two kinds of case, not the
   effect of the camera. Cases closed as withdrawn or uncooperative are excluded from both sides.
-- **The complaint map is by place, not by roster.** Allegations are counted where the incident
+- **The complaint map is by place.** Allegations are counted where the incident
   occurred. {c(cc['allegations_without_precinct'])} allegations carry no precinct and are left
   out. The **121st Precinct** is shown as no-data, not zero: the board has never coded a single
   complaint to it since the precinct was created on Staten Island in 2013.
@@ -717,7 +717,7 @@ Total NYPD strength is a perennial fight at City Council budget hearings, and th
 {c(stats['officers'])} needs context before it is cited:
 
 - **Recruits are in the count.** {c(sf['recruits'])} officers are in the `RTS RECRUITS`
-  command — recruits in the Police Academy, and the single largest command on the whole
+  command — recruits in the Police Academy, and the largest command on the
   force — plus about {c(sf['academy'])} in the Police Academy itself. They are active
   members but not deployed.
 - **So are officers who aren't working.** {c(sf['military_leave'])} sit at the
@@ -729,7 +729,7 @@ Total NYPD strength is a perennial fight at City Council budget hearings, and th
   precinct-numbered `DOMESTIC VIOLENCE SQUAD` commands that are organizationally separate
   from the precinct patrol roster. The work stayed local even as the officers were
   reorganized out of patrol.
-- **Patrol strength is not a precinct's full footprint.** The precinct map counts patrol
+- **Patrol strength undercounts a precinct's footprint.** The precinct map counts patrol
   and field-training commands ({c(sf['precinct_patrol'])} officers). Another
   ~{c(sf['precinct_squads_extra'])} work in precinct-based detective and domestic-violence
   squads that fall outside that patrol count.
@@ -755,7 +755,7 @@ specific claim against the original datasets before publishing.
 ## AI disclosure
 
 The data pipeline and interface were assembled with AI assistance. Every number is
-computed from the sources above; none is invented. The build and this document are
+computed from the sources above. The build and this document are
 reproducible from `build.py`.
 """
 (OUT.parent / "methodology.md").write_text(methodology_md)

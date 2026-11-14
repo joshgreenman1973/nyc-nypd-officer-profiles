@@ -33,9 +33,9 @@ only. The CCRB is a separate agency with its own case file, published as four mo
 
 | Dataset | ID | Rows | Role in this site |
 |---|---|---|---|
-| Allegations Against Police Officers | `6xgr-kwjq` | 436,269 | Complaint counts per officer; the FADO and disposition charts; per-officer detail (fetched live) |
+| Allegations Against Police Officers | `6xgr-kwjq` | 436,268 | Complaint counts per officer; the FADO and disposition charts; per-officer detail (fetched live) |
 | Police Officers | `2fir-qns4` | 99,008 | The name-and-shield match to the NYPD roster |
-| Complaints Against Police Officers | `2mby-ccnw` | 142,736 | Incident date, precinct and body-camera evidence |
+| Complaints Against Police Officers | `2mby-ccnw` | 142,735 | Incident date, precinct and body-camera evidence |
 | Penalties | `keep-pkmh` | 15,423 | What the NYPD did after the board substantiated |
 
 **The join.** The two agencies share no key: the NYPD publishes a `profile_id`, the CCRB a
@@ -74,7 +74,7 @@ To rebuild: `python3 build.py` (standard library only, no API token required).
 
 ### Civilian complaints
 
-- **Most allegations are not substantiated.** 436,269 allegations are on
+- **Most allegations are not substantiated.** 436,268 allegations are on
   file; 26,954 (6.2%) were substantiated by
   the board. The largest disposition category is cases closed because the complainant
   stopped participating.

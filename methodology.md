@@ -33,10 +33,10 @@ only. The CCRB is a separate agency with its own case file, published as four mo
 
 | Dataset | ID | Rows | Role in this site |
 |---|---|---|---|
-| Allegations Against Police Officers | `6xgr-kwjq` | 436,994 | Complaint counts per officer; the FADO and disposition charts; per-officer detail (fetched live) |
+| Allegations Against Police Officers | `6xgr-kwjq` | 437,233 | Complaint counts per officer; the FADO and disposition charts; per-officer detail (fetched live) |
 | Police Officers | `2fir-qns4` | 99,008 | The name-and-shield match to the NYPD roster |
-| Complaints Against Police Officers | `2mby-ccnw` | 142,980 | Incident date, precinct and body-camera evidence |
-| Penalties | `keep-pkmh` | 15,476 | What the NYPD did after the board substantiated |
+| Complaints Against Police Officers | `2mby-ccnw` | 143,018 | Incident date, precinct and body-camera evidence |
+| Penalties | `keep-pkmh` | 15,501 | What the NYPD did after the board substantiated |
 
 **The join.** The two agencies share no key: the NYPD publishes a `profile_id`, the CCRB a
 `tax_id`. Officers are matched on surname, first name and shield number, and only where that
@@ -58,7 +58,7 @@ as having a clean record — an unmatched officer is not an officer without comp
   recognitions and share with a sustained charge.
 - **`stats.json`** — all overview aggregates (rank distribution, tenure bands, award
   tiers, top training types, headline totals and the CCRB block).
-- **`ccrb.json`** — per-officer complaint counts for the 18,887
+- **`ccrb.json`** — per-officer complaint counts for the 18,899
   serving officers who have one, plus the tax id the drawer needs to fetch their record live,
   plus an explicit list of the officers who could not be matched at all.
 - **`precincts.geojson`** — precinct polygons, coordinates rounded to 4 decimal places
@@ -74,20 +74,20 @@ To rebuild: `python3 build.py` (standard library only, no API token required).
 
 ### Civilian complaints
 
-- **Most allegations are not substantiated.** 436,994 allegations are on
-  file; 27,063 (6.2%) were substantiated by
+- **Most allegations are not substantiated.** 437,233 allegations are on
+  file; 27,104 (6.2%) were substantiated by
   the board. The largest disposition category is cases closed because the complainant
   stopped participating.
 - **A substantiated allegation may bring no penalty.** The board investigates; the NYPD decides the penalty and
-  reports it back. Across 15,476 referrals, the most common outcome
-  is **no penalty at all** — 3,182, or 23.4% of referrals with
+  reports it back. Across 15,501 referrals, the most common outcome
+  is **no penalty at all** — 3,182, or 23.3% of referrals with
   a reported outcome.
 - **Only serving officers appear.** The complaint tables cover
   99,008 officers, most of whom have left the force. This site shows the
-  18,887 who are still on today's roster, so an officer who
+  18,899 who are still on today's roster, so an officer who
   accumulated complaints and then retired is absent.
 - **The body-camera comparison is not causal.** Adjudicated complaints from 2019 on were
-  substantiated 49.2% of the time with body-worn camera evidence and
+  substantiated 49.3% of the time with body-worn camera evidence and
   35.8% without. Cases that draw footage differ from cases that do not
   — there was a recorded encounter to begin with — so this compares two kinds of case, not the
   effect of the camera. Cases closed as withdrawn or uncooperative are excluded from both sides.
